@@ -1,80 +1,122 @@
+
+
+header {
+    background-color: #63b3ed;
+    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+}
+
+p {
+    font-family: 'Consolas', 'Monaco', 'Bitstream Vera Sans Mono', monospace;
+}
+
 body {
-  background: #fafafa;
-  color: #333333;
-  margin-top: 5rem;
+    margin-left: 10px;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  color: #444444;
+h1 {
+    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+    margin-left: 20px;
+    color: #101010;
 }
 
-.bg-steel {
-  background-color: #5f788a;
+form {
+    align-content: center;
 }
 
-.site-header .navbar-nav .nav-link {
-  color: #cbd5db;
+* {
+    box-sizing: border-box;
+    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+
 }
 
-.site-header .navbar-nav .nav-link:hover {
-  color: #ffffff;
+a {
+    color: #0044dd;
 }
 
-.site-header .navbar-nav .nav-link.active {
-  font-weight: 500;
+.login, .register {
+    width: 400px;
+    margin: 100px auto;
 }
 
-.content-section {
-  background: #ffffff;
-  padding: 10px 20px;
-  border: 1px solid #dddddd;
-  border-radius: 3px;
-  margin-bottom: 20px;
+.login h1, .register h1 {
+    text-align: center;
+
 }
 
-.article-title {
-  color: #444444;
+.login a, .register a {
+    margin-left: -15px;
 }
 
-a.article-title:hover {
-  color: #428bca;
-  text-decoration: none;
+.login .links, .register .links {
+  	display: flex;
+  	padding: 0 15px;
+    text-align: center;
+}
+.login .links a, .register .links a {
+    color: #00a000;
+  	text-decoration: none;
+  	display: inline-flex;
+  	padding: 0 10px 10px 10px;
+  	font-weight: bold;
+}
+.login .links a:hover, .register .links a:hover {
+  	color: #9da3ac;
+}
+.login .links a.active, .register .links a.active {
+  	border-bottom: 3px solid #3274d6;
+  	color: #3274d6;
 }
 
-.article-content {
-  white-space: pre-line;
+.login form, .register form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
 }
 
-.article-img {
-  height: 65px;
-  width: 65px;
-  margin-right: 16px;
+.login form label, .register form label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10px;
+    height: 10px;
+    /*background-color: #3182ce;*/
+
 }
 
-.article-metadata {
-  padding-bottom: 1px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid #e3e3e3
+.login form input[type="password"], .login form input[type="text"], .register form input[type="password"], .register form input[type="text"]{
+
+    width: 400px;
+    height: 50px;
+
 }
 
-.article-metadata a:hover {
-  color: #333;
-  text-decoration: none;
+.login form input[type="password"], .login form input[type="text"], .register form input[type="password"], .register form input[type="text"], {
+  	width: 400px;
+  	height: 50px;
+  	border: 3px solid #dee0e4;
+  	margin-bottom: 40px;
+  	padding: 0 15px;
+
+}
+.login form input[type="submit"], .register form input[type="submit"] {
+  	width: 100%;
+  	padding: 15px;
+  	margin-top: 20px;
+  	background-color: #3274d6;
+  	border: 0;
+  	cursor: pointer;
+  	font-weight: bold;
+  	color: #ffffff;
+  	transition: background-color 0.2s;
+}
+.login form input[type="submit"]:hover, .register form input[type="submit"]:hover {
+  	background-color: #2868c7;
+  	transition: background-color 0.2s;
 }
 
-.article-svg {
-  width: 25px;
-  height: 25px;
-  vertical-align: middle;
+.headerlinks {
+    text-align: right;
+    font-size: medium;
 }
 
-.account-img {
-  height: 125px;
-  width: 125px;
-  margin-right: 20px;
-  margin-bottom: 16px;
-}
-
-.account-heading {
-  font-size: 2.5rem;
-}
