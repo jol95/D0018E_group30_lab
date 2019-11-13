@@ -1,0 +1,17 @@
+
+{% extends 'layout.html' %}
+
+{% block content %}
+<form action="{{ url_for('login') }}" method="post">
+    <input type="text" name="firstName" placeholder="Username" id="username" required>
+    <input type="text" name="lastName" placeholder="Password" id="password" required>
+    <div class="msg">{{ msg }}</div>
+    <input type="submit" value="Login">
+</form>
+{% endblock %}
+   
+{% block sidebar%}
+
+{% endblock %}
+   
+  
