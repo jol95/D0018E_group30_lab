@@ -7,7 +7,12 @@ from random import randint
 app = Flask(__name__)
 app.secret_key = "abc"
 
-
+# MYSQL connection setting
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'Choss!95'
+app.config['MYSQL_DATABASE'] = 'webshop'
+mysql = MySQL(app)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -45,10 +50,6 @@ def product():
     args = request.args
     prod = getRow('products', 'prodID='+args.get("id"), mysql)
     return render_template('productpage.html', prod = prod)
-
-@app.route('/register')
-def register():
-    return render_template('register.html')
 
 @app.route('/getuser')
 def getSess():
