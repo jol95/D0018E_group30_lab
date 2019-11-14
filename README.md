@@ -20,3 +20,14 @@ user = root
 password = Choss!95
 
 database = webshop
+
+## CREATE PRODUCT TABLE ##
+
+CREATE TABLE IF NOT EXISTS `webshop`.`products` (
+  `prodID` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(60) NOT NULL,
+  `desc` MEDIUMTEXT NULL,
+  `price` INT NOT NULL,
+  `img` VARCHAR(45) NULL,
+  PRIMARY KEY (`prodID`))
+ENGINE = InnoDB
