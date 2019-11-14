@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, session
+from flask import *
 from flask_mysqldb import MySQL
 from SQLfunctions import *
 from random import randint
+from forms import *
 
 # Initiate Flask app
 app = Flask(__name__)
@@ -11,7 +12,7 @@ app.secret_key = "abc"
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'Choss!95'
-app.config['MYSQL_DATABASE'] = 'webshop'
+app.config['MYSQL_DB'] = 'webshop'
 mysql = MySQL(app)
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -19,7 +20,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         flash(f'Account created for {form.email.data}!', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('index'))
     return render_template('register.html', form=form)
 
 
@@ -29,7 +30,7 @@ def login():
     if form.validate_on_submit():
         if form.email.data == 'simon@hotmail.com' and form.password.data == 'password':
             flash('You Are Now Logged In!', 'success')
-            return redirect(url_for('home'))
+            return redirect(url_for('index'))
         else:
             flash('Invalid Email Or Password', 'danger')
     return render_template('login.html', form=form)
