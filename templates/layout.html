@@ -10,6 +10,9 @@
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main1.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    {% block stylesheets %}
+    {% endblock %}
+
     {% if title %}
   <title> website - {{ title }} </title>
     {% else  %}
@@ -43,7 +46,6 @@
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
-<<<<<<< HEAD:layout.html
           {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %}
                   {% for category, message in messages %}
@@ -53,17 +55,16 @@
                   {% endfor %}
               {% endif %}
           {% endwith %}
-          {% block content %}{% endblock %}
-=======
-          {% block content %}          
+          {% block content %}
           {% endblock %}
->>>>>>> aws key added:templates/layout.html
         </div>
 
 
         <div class="col-md-4">
           <div class="content-section">
             {% block sidebar %}
+            <h3>Varukorg</h3>
+            <a href="/getuser">Klicka här!</a>
             {% endblock %}
           </div>
         </div>

@@ -1,21 +1,12 @@
-<<<<<<< HEAD
-from flask import Flask, render_template, url_for, flash, redirect
-from forms import RegistrationForm, LoginForm
+from flask import Flask, render_template, request, session
+from flask_mysqldb import MySQL
+from SQLfunctions import *
+from random import randint
 
+# Initiate Flask app
 app = Flask(__name__)
+app.secret_key = "abc"
 
-app.config['SECRET_KEY'] = 'bdb878ef8ea259ef877a3686726cf4f9'
-
-
-@app.route("/")
-@app.route("/home")
-def home():
-    return render_template('index.html')
-
-
-@app.route("/products")
-def about():
-    return render_template('products.html')
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -39,36 +30,31 @@ def login():
     return render_template('login.html', form=form)
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
-=======
-from flask import Flask, render_template, request
-from flask_mysqldb import MySQL
-app = Flask(__name__)
-
-#MYSQL CONNECTION SETTINGS
-
-# app.config['MYSQL_HOST'] = 'sql7.freemysqlhosting.net'
-# app.config['MYSQL_USER'] = 'sql7311847'
-# app.config['MYSQL_PASSWORD'] = '5h2gDVdPYS'
-# app.config['MYSQL_DB'] = 'sql7311847'
-# app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-
-app.config['MYSQL_HOST'] = 'gr30db.database.windows.net'
-app.config['MYSQL_PORT'] = 1433
-app.config['MYSQL_USER'] = 'gr30adm'
-app.config['MYSQL_PASSWORD'] = 'Choss!95'
-app.config['MYSQL_DB'] = 'gr30db'
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-
-mysql = MySQL(app)
-
 @app.route('/')
 def index():
-	cur = mysql.connection.cursor()
-	cur.execute('''CREATE TABLE example (id INTEGER, name VARCHAR(20))''')
-	return 'done'
+
+    # Initiate session-variable
+    session['userid'] = randint(0, 10000)
+
+    # Fetch all rows from product-table
+    prod = getTable('products', mysql)
+    return render_template('index.html', prod = prod)
+
+@app.route('/product')
+def product():
+    args = request.args
+    prod = getRow('products', 'prodID='+args.get("id"), mysql)
+    return render_template('productpage.html', prod = prod)
+
+@app.route('/register')
+def register():
+    return render_template('register.html')
+
+@app.route('/getuser')
+def getSess():
+    if 'userid' in session:
+        res = session['userid']
+    return render_template('getuser.html', res = res)
 
 if __name__ == "__main__":
 	app.run(debug = True)
->>>>>>> aws key added
