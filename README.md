@@ -9,6 +9,7 @@
     chmod 400 "nyckelns filnamn"
 
 3. Anslut till servern via SSH med nyckeln
+    
     ssh -i "nyckelns filnamn" ubuntu@ec2-13-53-70-153.eu-north-1.compute.amazonaws.com
 
 ## MYSQL databas ##
