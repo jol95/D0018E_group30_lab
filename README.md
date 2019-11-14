@@ -1,8 +1,6 @@
 # D0018E_group30_lab
 
 
-
-
 ## Anslut till AWS ##
 1. cd till mappen där din personliga nyckel finns.
 
@@ -15,6 +13,9 @@
 
 ## MYSQL databas ##
 host = localhost
+
 user = root
+
 password = Choss!95
+
 database = webshop
