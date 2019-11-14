@@ -27,10 +27,16 @@ def register():
     return render_template('register.html', form=form)
 
 
-@app.route("/login")
+@app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    return render_template('login.html', title='Login', form=form)
+    if form.validate_on_submit():
+        if form.email.data == 'simon@hotmail.com' and form.password.data == 'password':
+            flash('You Are Now Logged In!', 'success')
+            return redirect(url_for('home'))
+        else:
+            flash('Invalid Email Or Password', 'danger')
+    return render_template('login.html', form=form)
 
 
 if __name__ == '__main__':
