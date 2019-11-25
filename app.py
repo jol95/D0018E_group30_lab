@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'bdb878ef8ea259ef877a3686726cf4f9'
 
-app.config['MYSQL_HOST'] = 'ec2-13-53-70-153.eu-north-1.compute.amazonaws.com'
+app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_PORT'] = 3306
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'Choss!95'
