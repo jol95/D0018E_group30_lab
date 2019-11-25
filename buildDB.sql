@@ -67,15 +67,10 @@ CREATE TABLE IF NOT EXISTS `webshop`.`cart` (
   `qty` INT NOT NULL,
   PRIMARY KEY (`cartID`),
   INDEX `prodID_idx` (`prodID` ASC),
-  INDEX `custID_idx` (`custID` ASC),
+  UNIQUE INDEX `custID_UNIQUE` (`custID` ASC),
   CONSTRAINT `prodID`
     FOREIGN KEY (`prodID`)
     REFERENCES `webshop`.`products` (`prodID`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `custID`
-    FOREIGN KEY (`custID`)
-    REFERENCES `webshop`.`customers` (`custID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB

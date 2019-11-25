@@ -1,7 +1,10 @@
-from flask import *
+# installed libs
+from flask import Flask, render_template, request, session, flash, redirect, url_for
 from flask_mysqldb import MySQL
-from SQLfunctions import *
 from random import randint
+
+# created libs
+from SQLfunctions import *
 from forms import *
 
 # Initiate Flask app
@@ -18,7 +21,11 @@ mysql = MySQL(app)
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit():        
+####    
+        
+
+####
         flash(f'Account created for {form.email.data}!', 'success')
         return redirect(url_for('index'))
     return render_template('register.html', form=form)
@@ -38,10 +45,6 @@ def login():
 
 @app.route('/')
 def index():
-
-    # Initiate session-variable
-    session['userid'] = randint(0, 10000)
-
     # Fetch all rows from product-table
     prod = getTable('products', mysql)
     return render_template('index.html', prod = prod)
@@ -52,11 +55,37 @@ def product():
     prod = getRow('products', 'prodID='+args.get("id"), mysql)
     return render_template('productpage.html', prod = prod)
 
-@app.route('/getuser')
-def getSess():
-    if 'userid' in session:
-        res = session['userid']
-    return render_template('getuser.html', res = res)
+@app.route('/addtocart')
+def cart():
+    # redirect user to login page if not logged in
+    if 'userid' not in session:
+        flash('Please log in or create an account.')
+        return redirect('/login')
+    
+    # attribute data for shoping cart
+    custID = str(session['userid'])  # temporary customer ID (unregistred user)
+    prodID = str(request.args.get('id')) # productID
+    qty = str(request.args.get('qty'))   # quantity
+
+    #TODO: Lägg till i en shopping cart fungerar. Lägg till till en existerande shopping cart fungerar inte.
+    # Add to shopping cart
+    insertTo('cart', 'custID, prodID, qty', custID+', '+prodID+', '+qty, mysql)
+
+    flash('Product has been added to the shopping cart.')
+    return redirect('/product?id='+prodID)
+
+
+# länk för att cleara session
+@app.route('/ds')
+def dropsess():
+    session.clear()
+    return redirect('/')
+
+# länk för att starta session
+@app.route('/startsess')
+def startsess():
+    session['userid'] = 1981
+    return redirect('/')
 
 if __name__ == "__main__":
 	app.run(debug = True)

@@ -10,7 +10,7 @@
     <a href="/product?id={{items.0}}" titel="{{ items.1 }}">
     <div class="item">
         <div class="img">
-            {% if items.4 == none %}
+            {% if items.4 == '' %}
             <img src="{{ url_for('static', filename='resources/noimg.jpg') }}" alt="noimg" class="prodimg"/>
             {% else %}
             <img src="{{ url_for('static', filename='resources/') }}{{ items.4 }}" alt="{{items.4}}" class="prodimg"/>
