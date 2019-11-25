@@ -1,24 +1,48 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, url_for, flash, redirect, request
 from flask_mysqldb import MySQL
-from SQLfunctions import *
-from random import randint
+from forms import RegistrationForm, LoginForm
+from werkzeug.security import generate_password_hash, check_password_hash
 
-# Initiate Flask app
+mysql = MySQL()
 app = Flask(__name__)
-app.secret_key = "abc"
 
-# MYSQL connection setting
-app.config['MYSQL_HOST'] = 'localhost'
+app.config['SECRET_KEY'] = 'bdb878ef8ea259ef877a3686726cf4f9'
+
+app.config['MYSQL_HOST'] = 'ec2-13-53-70-153.eu-north-1.compute.amazonaws.com'
+app.config['MYSQL_PORT'] = 3306
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'Choss!95'
-app.config['MYSQL_DATABASE'] = 'webshop'
-mysql = MySQL(app)
+app.config['MYSQL_DB'] = 'webshop'
+#app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+mysql.init_app(app)
+
+
+
+@app.route("/")
+@app.route("/home")
+def home():
+    return render_template('index.html')
+
+
+@app.route("/products")
+def products():
+    return render_template('products.html')
+
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        flash(f'Account created for {form.email.data}!', 'success')
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        hashed_pwd = generate_password_hash(form.password.data)
+        cursor.callproc('sp_createCustomer', (form.first_name.data, form.last_name.data, form.email.data, hashed_pwd, form.home_address.data, form.post_code.data, form.country.data, form.phone_number.data))
+        data = cursor.fetchall()
+        if len(data) is 0:
+            conn.commit()
+            flash(f'Account created for {form.email.data}!', 'success')
+        cursor.close()
+        conn.close()
         return redirect(url_for('home'))
     return render_template('register.html', form=form)
 
@@ -35,27 +59,5 @@ def login():
     return render_template('login.html', form=form)
 
 
-@app.route('/')
-def index():
-
-    # Initiate session-variable
-    session['userid'] = randint(0, 10000)
-
-    # Fetch all rows from product-table
-    prod = getTable('products', mysql)
-    return render_template('index.html', prod = prod)
-
-@app.route('/product')
-def product():
-    args = request.args
-    prod = getRow('products', 'prodID='+args.get("id"), mysql)
-    return render_template('productpage.html', prod = prod)
-
-@app.route('/getuser')
-def getSess():
-    if 'userid' in session:
-        res = session['userid']
-    return render_template('getuser.html', res = res)
-
-if __name__ == "__main__":
-	app.run(debug = True)
+if __name__ == '__main__':
+    app.run(debug=True)
