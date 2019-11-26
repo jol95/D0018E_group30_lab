@@ -9,10 +9,10 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'bdb878ef8ea259ef877a3686726cf4f9'
 
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'Choss!95'
-app.config['MYSQL_DATABASE_DB'] = 'webshop'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'Choss!95'
+app.config['MYSQL_DB'] = 'webshop'
+app.config['MYSQL_HOST'] = 'localhost'
 mysql = MySQL(app)
 
 
