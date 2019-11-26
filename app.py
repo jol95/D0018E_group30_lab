@@ -7,7 +7,7 @@ from flask_mysqldb import MySQL
 from SQLfunctions import *
 from forms import *
 
-# Initiate Flask app
+
 app = Flask(__name__)
 app.secret_key = "abc"
 
@@ -98,7 +98,7 @@ def cart():
         return redirect('/login')
     attr = 'cart.prodID, products.name, cart.qty'
     join = 'products ON cart.prodID = products.prodID'
-    cond = 'cart.custID = 1891'
+    cond = 'cart.custID ='+str(session['userid'])
     cart = innerJoin('cart', attr, join, cond)
     lenofcart = len(cart)
     return render_template('cart.html', cart = cart, lenofcart=lenofcart)
@@ -146,5 +146,5 @@ def startsess():
     session['userid'] = 1891
     return redirect('/')
 
-if __name__ == "__main__":
-	app.run(debug = True)
+if __name__ == '__main__':
+    app.run(debug=True)
