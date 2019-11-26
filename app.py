@@ -36,7 +36,7 @@ def register():
         cur = mysql.connection.cursor()
         cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)', (form.first_name.data,form.last_name.data,form.email.data,form.password.data,form.home_address.data,form.post_code.data,form.country.data,form.phone_number.data ))
         mysql.connection.commit()
-        flash(f'Account created for {form.email.data}!', 'success')
+        #flash(f'Account created for {form.email.data}!', 'success')
         return redirect(url_for('home'))
     return render_template('register.html', form=form)
 
