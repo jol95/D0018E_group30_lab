@@ -28,27 +28,36 @@ def products():
     item = getRow('products', 'prodID=' + args.get("id"))
     return render_template('products.html', item=item)
 
-#flash(f'Account created for {form.email.data}!', 'success')
+
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
-    if form.validate_on_submit():
-        cur = mysql.connection.cursor()
-        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)', (form.first_name.data,form.last_name.data,form.email.data,form.password.data,form.home_address.data,form.post_code.data,form.country.data,form.phone_number.data ))
-        mysql.connection.commit()
-        #flash(f'Account created for {form.email.data}!', 'success')
+    try:
+        if form.validate_on_submit():
+            cur = mysql.connection.cursor()
+            cur.execute('SELECT * FROM customers WHERE email = %s', form.email.data)
+            account = cur.fetchone()
+            if account:
+                return json.dumps({'error': str(account)})
+            else:
+                cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)', (form.first_name.data,form.last_name.data,form.email.data,form.password.data,form.home_address.data,form.post_code.data,form.country.data,form.phone_number.data ))
+                mysql.connection.commit()
+    except Exception as e:
+        return json.dumps({'error': str(e)})
+    finally:
+        cur.close()
         return redirect(url_for('home'))
     return render_template('register.html', form=form)
 
 
-@app.route("/login", methods=['GET', 'POST'])
+#@app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         if form.email.data == 'simon@hotmail.com' and form.password.data == 'password':
             #flash('You Are Now Logged In!', 'success')
             return redirect(url_for('home'))
-        else:
+        #else:
             #flash('Invalid Email Or Password', 'danger')
     return render_template('login.html', form=form)
 
