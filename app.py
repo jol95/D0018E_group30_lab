@@ -95,7 +95,7 @@ def startsess():
     session['userid'] = 1891
     return redirect('/')
 
-# länk för att cleara session
+
 @app.route('/logout')
 def logout():
     session.clear()
