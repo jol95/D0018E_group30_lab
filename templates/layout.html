@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -35,14 +35,20 @@
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
-              <a class="nav-item nav-link" href="/login">Login</a>
+              {% if 'userid' in session: %}
+              <a class="nav-item nav-link" href="/login">My page</a>
+              <a class="nae-item nav-link" href="/cart">Cart</a>
+              <a class="nav-item nav-link" href="{{ url_for('logout')}}">Logout</a>
+              {% else: %}
+              <a class="nav-item nav-link" href="{{ url_for('login')}}">Login</a>
               <a class="nav-item nav-link" href="/register">Register</a>
+              {% endif %}
             </div>
           </div>
         </div>
       </nav>
     </header>
-    
+
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-8">
@@ -63,8 +69,6 @@
         <div class="col-md-4">
           <div class="content-section">
             {% block sidebar %}
-            <h3>Varukorg</h3>
-            <a href="/getuser">Klicka här!</a>
             {% endblock %}
           </div>
         </div>
