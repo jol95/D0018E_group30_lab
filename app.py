@@ -34,7 +34,8 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
-        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)',(form.first_name.data, form.last_name.data, form.email.data, form.password.data, form.home_address.data,form.post_code.data, form.country.data, form.phone_number.data))
+        hashed_password = generate_password_hash(form.password.data)
+        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)',(form.first_name.data, form.last_name.data, form.email.data, hashed_password, form.home_address.data,form.post_code.data, form.country.data, form.phone_number.data))
         mysql.connection.commit()
         return redirect(url_for('home'))
     return render_template('register.html', form=form)
