@@ -26,18 +26,12 @@ def products():
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
-    try:
-        if form.validate_on_submit():
-            values = '%s, %s, %s, %s, %s, %s, %s, %s ' % (form.first_name.data, form.last_name.data, form.email.data, form.password.data, form.home_address.data, form.post_code.data, form.country.data, form.phone_number.data)
-            attr = 'firstname, lastname, email, password, address, postcode, country, phoneno'
-            if exist('Customers', 'email='+form.email.data):
-                return json.dumps({'email already exists'})
-            else:
-                insertTo('cart', attr, values)
-                flash(f'Account created for {form.email.data}!', 'success')
+    if form.validate_on_submit():
+        values = '%s, %s, %s, %s, %s, %s, %s, %s ' % ('simon, pontin, simon_pontin@hotmail.com, hej, klint, 234, sweden, 13123123')
+        attr = 'firstname, lastname, email, password, address, postcode, country, phoneno'
+        insertTo('customer', attr, values)
+        flash(f'Account created for {form.email.data}!', 'success')
         return redirect(url_for('home'))
-    except Exception as e:
-        return json.dumps({'error': str(e)})
     return render_template('register.html', form=form)
 
 
