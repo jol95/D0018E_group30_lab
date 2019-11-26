@@ -65,7 +65,7 @@ def product():
 def addtocart():
     # redirect user to login page if not logged in
     if 'userid' not in session:
-        flash('Please log in or create an account.')
+        flash('Please log in or create an account.', 'danger')
         return redirect('/login')
     
     # attribute data for shoping cart
@@ -86,7 +86,7 @@ def addtocart():
         values = '%s, %s, %s' %(custID, prodID, qty)
         insertTo('cart', attr, values)
 
-    flash('Product has been added to the shopping cart.')
+    flash('Product has been added to the shopping cart.', 'success')
     return redirect('/product?id='+prodID)
 
 ## CART PAGE ##
@@ -94,7 +94,7 @@ def addtocart():
 def cart():
     # redirect user to login page if not logged in
     if 'userid' not in session:
-        flash('Please log in or create an account.')
+        flash('Please log in or create an account.', 'danger')
         return redirect('/login')
     attr = 'cart.prodID, products.name, cart.qty'
     join = 'products ON cart.prodID = products.prodID'
@@ -108,7 +108,7 @@ def cart():
 def updatecart():
     # redirect user to login page if not logged in
     if 'userid' not in session:
-        flash('Please log in or create an account.')
+        flash('Please log in or create an account.', 'danger')
         return redirect('/login')
 
     custID = str(session['userid'])  # temporary customer ID (unregistred user)
@@ -116,6 +116,7 @@ def updatecart():
     qty = str(request.args.get('qty'))   # quantity
     cond = 'custID = '+custID+' AND prodID = '+prodID   # insert/update condition
     updateIn('cart', 'qty', qty, cond)
+    flash('The cart has been updated.', 'success')
     return redirect('/cart')
 
 ## CLEAR CART FUNCTION ##
@@ -123,15 +124,14 @@ def updatecart():
 def clearcart():
     # redirect user to login page if not logged in
     if 'userid' not in session:
-        flash('Please log in or create an account.')
+        flash('Please log in or create an account.', 'danger')
         return redirect('/login')
-    
     deleteFrom('cart', 'custID='+str(session['userid']))
     return redirect('/cart')
 
 @app.route('/confirmclear')
 def confirmclear():
-    return redirect('/cart', confirm = 1)
+    return redirect('/cart?confirm=True')
 
 
 # länk för att cleara session

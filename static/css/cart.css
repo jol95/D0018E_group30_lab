@@ -44,17 +44,13 @@
 }
 
 .col3 {
-    width: 100px;
-    margin: 0px;
-}
-
-.col4 {
-    width: 50px;
-    margin: 0px;
+    float: left;
+    width: 170px;
 }
 
 input.col3 {
     width: 50px;
+    height: 28px;
 }
 
 input.hidden {
