@@ -34,14 +34,8 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
-        data = cur.fetchall()
-
-        if len(data) is 0:
-            cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)',(form.first_name.data, form.last_name.data, form.email.data, form.password.data, form.home_address.data,form.post_code.data, form.country.data, form.phone_number.data))
-            mysql.connection.commit()
-            return json.dumps({'message': 'User created successfully !'})
-        else:
-            return json.dumps({'error': str(data[0])})
+        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)',(form.first_name.data, form.last_name.data, form.email.data, form.password.data, form.home_address.data,form.post_code.data, form.country.data, form.phone_number.data))
+        mysql.connection.commit()
         return redirect(url_for('home'))
     return render_template('register.html', form=form)
 
