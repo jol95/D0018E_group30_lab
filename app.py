@@ -4,18 +4,16 @@ from forms import RegistrationForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from SQLfunctions import *
 
-
+mysql = MySQL()
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'bdb878ef8ea259ef877a3686726cf4f9'
 
-mysql_host = 'localhost'
-mysql_user = 'root'
-mysql_pw = 'Choss!95'
-mysql_db = 'webshop'
-
-# Open connection to database
-mysql = MySQLdb.connect(mysql_host, mysql_user, mysql_pw, mysql_db)
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'Choss!95'
+app.config['MYSQL_DATABASE_DB'] = 'webshop'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+mysql.init_app(app)
 
 
 @app.route("/")
