@@ -28,6 +28,19 @@ def getRow(table, condition):
     cur.close()
     return result
 
+# INNER JOIN FUNCTION
+def innerJoin(table, attr, join, condition):
+    # check if condition is set
+    query = 'SELECT '+attr+' FROM '+join
+    if condition:
+        query = 'SELECT '+attr+' FROM ('+table+' INNER JOIN '+join+') WHERE '+condition
+    cur = mysql.cursor()
+    cur.execute(query)
+    result = cur.fetchall()
+    cur.close()
+    return result
+
+
 # Insert row into a table with sepcified attributes
 def insertTo(table, attr, values):
     query = 'INSERT INTO '+table+' ('+attr+') VALUES ('+values+')'
@@ -40,6 +53,15 @@ def insertTo(table, attr, values):
 # Update column-value in given table with specified condition
 def updateIn(table, column, value, condition):
     query = 'UPDATE '+table+' SET '+column+'='+value+' WHERE '+condition
+    cur = mysql.cursor()
+    cur.execute(query)
+    mysql.commit()
+    cur.close()
+    return query
+
+# delete from given tabel with specified condition
+def deleteFrom(table, condition):
+    query = 'DELETE FROM '+table+' WHERE '+condition
     cur = mysql.cursor()
     cur.execute(query)
     mysql.commit()

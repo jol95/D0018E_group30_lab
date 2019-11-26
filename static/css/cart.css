@@ -1,5 +1,5 @@
 /* TABLE HEAD */
-.thead {
+.header {
     font-size: 24pt;
 }
 
@@ -8,6 +8,7 @@
     display: box;
     padding 5px;
     width: 100%;
+    font: 11px, bold;
 }
 
 .titlerow > div {
@@ -16,10 +17,11 @@
     padding: 5px;
 }
 
-.t1 {
+.titlerow.t1 {
     widht: 500px;
 }
 
+/* ITEM ROWS */
 .itemrows {
     float: left;
     display: box;
@@ -29,4 +31,44 @@
 .itemrows > div {
     float: left;
     padding: 5px;
+}
+
+.col1 {
+    width: 150px;
+    margin: 0px;
+}
+
+.col2 {
+    width: 400px;
+    margin: 0px;
+}
+
+.col3 {
+    width: 100px;
+    margin: 0px;
+}
+
+.col4 {
+    width: 50px;
+    margin: 0px;
+}
+
+input.col3 {
+    width: 50px;
+}
+
+input.hidden {
+    display: none;
+}
+
+/* FOOTER */
+.footer {
+    width: 100%;
+    float: right;
+}
+
+.footer > div {
+    display: block;
+    padding: 10px;
+    float: right;
 }

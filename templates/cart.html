@@ -5,19 +5,39 @@
 {% endblock%}
 
 {% block content %}
-<div class="thead">Varukorg</div>
+<div class="header">Shopping cart</div>
 <div class="cartcontainer">
     <div class="titlerow">
-        <div class="t1">Artikelnummer</div>
-        <div>Benämning</div>
-        <div>Antal</div>
+        <div class="col1">ITEM NUMBER</div>
+        <div class="col2">NAME</div>
+        <div class="col3">QUANTITY</div>
+        <div class="col4">&nbsp;</div>
     </div>
+    {% if lenofcart <= 0:%}
+        <p>The shopping cart is empty.</p>
+    {% endif %}
     {% for items in cart: %}
     <div class="itemrows">
-        <div>{{items.1}}</div>
-        <div></div>
-        <div>{{items.3}}</div>
+        <div class="col1">{{items.0}}</div>
+        <div class="col2">{{items.1}}</div>
+        <div class="col3">
+            <form action="{{ url_for('updatecart') }}">
+                <input name="qty" value="{{items.2}}" class="col3" type="text">
+                <input name="id" value="{{items.0}}" class="hidden" type="text">
+        </div>
+        <div class="col4"><input type="submit" value="Update"></form></div>
     </div>
     {% endfor %}
+</div>
+<div class="footer">
+    <div>Checkout</div>
+    <div>
+        {# Prompt confim before clearing #}
+        {% if confirm: %}
+        Are you sure?
+        {% else: %}
+        <a href="/clearcart">Clear</a>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

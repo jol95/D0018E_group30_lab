@@ -35,8 +35,14 @@
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
-              <a class="nav-item nav-link" href="/login">Login</a>
+              {% if 'userid' in session: %}
+              <a class="nav-item nav-link" href="/login">My page</a>
+              <a class="nae-item nav-link" href="/cart">Cart</a>
+              <a class="nav-item nav-link" href="{{ url_for('logout')}}">Logout</a>
+              {% else: %}
+              <a class="nav-item nav-link" href="{{ url_for('login')}}">Login</a>
               <a class="nav-item nav-link" href="/register">Register</a>
+              {% endif %}
             </div>
           </div>
         </div>

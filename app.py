@@ -1,6 +1,7 @@
 #-*- coding: -utf-8 -*-
 # installed libs
 from flask import Flask, render_template, request, session, flash, redirect, url_for
+from flask_mysqldb import MySQL
 
 # created libs
 from SQLfunctions import *
@@ -10,16 +11,23 @@ from forms import *
 app = Flask(__name__)
 app.secret_key = "abc"
 
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'Choss!95'
+app.config['MYSQL_DB'] = 'webshop'
+
+mysql = MySQL(app)
+
 ## REGISTER PAGE ##
 @app.route("/register", methods=['GET', 'POST'])
-def register():
+def register():  
     form = RegistrationForm()
-    if form.validate_on_submit():        
-####    
-#TODO: SQL insert form data into customer table
-####
-        flash(f'Account created for {form.email.data}!', 'success')
-        return redirect(url_for('index'))
+    if form.validate_on_submit():
+        cur = mysql.connection.cursor()
+        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)', (form.first_name.data,form.last_name.data,form.email.data,form.password.data,form.home_address.data,form.post_code.data,form.country.data,form.phone_number.data ))
+        mysql.connection.commit()
+        #flash(f'Account created for {form.email.data}!', 'success')
+        return redirect(url_for('/'))
     return render_template('register.html', form=form)
 
 
@@ -81,21 +89,54 @@ def addtocart():
     flash('Product has been added to the shopping cart.')
     return redirect('/product?id='+prodID)
 
-
-#TODO: Skapa en sida som visar alla poster i kundvagnen
+## CART PAGE ##
 @app.route('/cart')
 def cart():
     # redirect user to login page if not logged in
     if 'userid' not in session:
         flash('Please log in or create an account.')
         return redirect('/login')
-    cart = getTable('cart')
-    return render_template('cart.html', cart = cart)
+    attr = 'cart.prodID, products.name, cart.qty'
+    join = 'products ON cart.prodID = products.prodID'
+    cond = 'cart.custID = 1891'
+    cart = innerJoin('cart', attr, join, cond)
+    lenofcart = len(cart)
+    return render_template('cart.html', cart = cart, lenofcart=lenofcart)
+
+## UPDATE CART FUNCTION ##
+@app.route('/updatecart')
+def updatecart():
+    # redirect user to login page if not logged in
+    if 'userid' not in session:
+        flash('Please log in or create an account.')
+        return redirect('/login')
+
+    custID = str(session['userid'])  # temporary customer ID (unregistred user)
+    prodID = str(request.args.get('id')) # productID
+    qty = str(request.args.get('qty'))   # quantity
+    cond = 'custID = '+custID+' AND prodID = '+prodID   # insert/update condition
+    updateIn('cart', 'qty', qty, cond)
+    return redirect('/cart')
+
+## CLEAR CART FUNCTION ##
+@app.route('/clearcart')
+def clearcart():
+    # redirect user to login page if not logged in
+    if 'userid' not in session:
+        flash('Please log in or create an account.')
+        return redirect('/login')
+    
+    deleteFrom('cart', 'custID='+str(session['userid']))
+    return redirect('/cart')
+
+@app.route('/confirmclear')
+def confirmclear():
+    return redirect('/cart', confirm = 1)
 
 
 # länk för att cleara session
-@app.route('/ds')
-def dropsess():
+@app.route('/logout')
+def logout():
     session.clear()
     return redirect('/')
 
