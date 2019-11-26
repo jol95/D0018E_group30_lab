@@ -37,6 +37,7 @@ def register():
         hashed_password = generate_password_hash(form.password.data)
         cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)',(form.first_name.data, form.last_name.data, form.email.data, hashed_password, form.home_address.data,form.post_code.data, form.country.data, form.phone_number.data))
         mysql.connection.commit()
+        flash('You Have Created An Account!', 'success')
         return redirect(url_for('home'))
     return render_template('register.html', form=form)
 
@@ -45,9 +46,17 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        if form.email.data == 'simon@hotmail.com' and form.password.data == 'password':
-            flash('You Are Now Logged In!', 'success')
-            return redirect(url_for('home'))
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT * FROM customers WHERE email = %s', form.email.data)
+        data = cur.fetchall()
+
+        if len(data) > 0:
+            if check_password_hash(str(data[0][4]), form.password.data):
+                session['userid'] = data[0][0]
+                flash('You Are Now Logged In!', 'success')
+                return redirect(url_for('home'))
+            else:
+                flash('Invalid Email Or Password', 'danger')
         else:
             flash('Invalid Email Or Password', 'danger')
     return render_template('login.html', form=form)
@@ -84,6 +93,12 @@ def addtocart():
 @app.route('/startsess')
 def startsess():
     session['userid'] = 1891
+    return redirect('/')
+
+# länk för att cleara session
+@app.route('/logout')
+def logout():
+    session.clear()
     return redirect('/')
 
 
