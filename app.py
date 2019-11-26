@@ -47,7 +47,9 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM customers WHERE email = %s', form.email.data)
+        query_string = "SELECT * FROM customers WHERE email = %s"
+        user_email = str(form.email.data)
+        cur.execute(query_string, user_email)
         data = cur.fetchall()
 
         if len(data) > 0:
