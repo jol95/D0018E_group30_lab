@@ -9,6 +9,14 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'bdb878ef8ea259ef877a3686726cf4f9'
 
+mysql_host = 'localhost'
+mysql_user = 'root'
+mysql_pw = 'Choss!95'
+mysql_db = 'webshop'
+
+# Open connection to database
+mysql = MySQLdb.connect(mysql_host, mysql_user, mysql_pw, mysql_db)
+
 
 @app.route("/")
 @app.route("/home")
@@ -27,9 +35,9 @@ def products():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        values = '%s, %s, %s, %s, %s, %s, %s, %s ' % ('simon, pontin, simon_pontin@hotmail.com, hej, klint, 234, sweden, 13123123')
-        attr = 'firstname, lastname, email, password, address, postcode, country, phoneno'
-        insertTo('customer', attr, values)
+        cur = mysql.connection.cursor()
+        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)', (form.first_name.data,form.last_name.data,form.email.data,form.password.data,form.home_address.data,form.post_code.data,form.country.data,form.phone_number.data ))
+        mysql.connection.commit()
         flash(f'Account created for {form.email.data}!', 'success')
         return redirect(url_for('home'))
     return render_template('register.html', form=form)
