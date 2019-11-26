@@ -34,14 +34,15 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM customers WHERE email = %s', form.email.data)
-        account = cur.fetchone()
-        if account:
-            return json.dumps({'error': str(account)})
-        else:
-            cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)', (form.first_name.data,form.last_name.data,form.email.data,form.password.data,form.home_address.data,form.post_code.data,form.country.data,form.phone_number.data ))
-            mysql.connection.commit()
-        cur.close()
+        #check = str(form.email.data)
+        #cur.execute('SELECT * FROM customers WHERE email = %s', check)
+        #account = cur.fetchone()
+        #if account:
+            #return json.dumps({'error': str(account)})
+        #else:
+        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)', (form.first_name.data,form.last_name.data,form.email.data,form.password.data,form.home_address.data,form.post_code.data,form.country.data,form.phone_number.data ))
+        mysql.connection.commit()
+        #cur.close()
         return redirect(url_for('home'))
     return render_template('register.html', form=form)
 
