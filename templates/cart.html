@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/cart.css') }}">
+{% endblock%}
+
+{% block content %}
+<div class="thead">Varukorg</div>
+<div class="cartcontainer">
+    <div class="titlerow">
+        <div class="t1">Artikelnummer</div>
+        <div>Benämning</div>
+        <div>Antal</div>
+    </div>
+    {% for items in cart: %}
+    <div class="itemrows">
+        <div>{{items.1}}</div>
+        <div></div>
+        <div>{{items.3}}</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

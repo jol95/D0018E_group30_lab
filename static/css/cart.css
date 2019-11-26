@@ -1,0 +1,32 @@
+/* TABLE HEAD */
+.thead {
+    font-size: 24pt;
+}
+
+.titlerow {
+    float: left;
+    display: box;
+    padding 5px;
+    width: 100%;
+}
+
+.titlerow > div {
+    float: left;
+    border-bottom: 1px solid black;
+    padding: 5px;
+}
+
+.t1 {
+    widht: 500px;
+}
+
+.itemrows {
+    float: left;
+    display: box;
+    width: 100%;
+}
+
+.itemrows > div {
+    float: left;
+    padding: 5px;
+}

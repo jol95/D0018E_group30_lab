@@ -67,7 +67,6 @@ CREATE TABLE IF NOT EXISTS `webshop`.`cart` (
   `qty` INT NOT NULL,
   PRIMARY KEY (`cartID`),
   INDEX `prodID_idx` (`prodID` ASC),
-  UNIQUE INDEX `custID_UNIQUE` (`custID` ASC),
   CONSTRAINT `prodID`
     FOREIGN KEY (`prodID`)
     REFERENCES `webshop`.`products` (`prodID`)

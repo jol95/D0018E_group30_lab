@@ -1,7 +1,6 @@
+#-*- coding: -utf-8 -*-
 # installed libs
 from flask import Flask, render_template, request, session, flash, redirect, url_for
-from flask_mysqldb import MySQL
-from random import randint
 
 # created libs
 from SQLfunctions import *
@@ -11,26 +10,20 @@ from forms import *
 app = Flask(__name__)
 app.secret_key = "abc"
 
-# MYSQL connection setting
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Choss!95'
-app.config['MYSQL_DB'] = 'webshop'
-mysql = MySQL(app)
-
+## REGISTER PAGE ##
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():        
 ####    
-        
-
+#TODO: SQL insert form data into customer table
 ####
         flash(f'Account created for {form.email.data}!', 'success')
         return redirect(url_for('index'))
     return render_template('register.html', form=form)
 
 
+## LOGIN PAGE ##
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -43,20 +36,25 @@ def login():
     return render_template('login.html', form=form)
 
 
+## INDEX PAGE ##
 @app.route('/')
 def index():
     # Fetch all rows from product-table
-    prod = getTable('products', mysql)
+    prod = getTable('products')
     return render_template('index.html', prod = prod)
 
+
+## PRODUCT PAGE ##
 @app.route('/product')
 def product():
     args = request.args
-    prod = getRow('products', 'prodID='+args.get("id"), mysql)
-    return render_template('productpage.html', prod = prod)
+    item = getRow('products', 'prodID='+args.get("id"))
+    return render_template('productpage.html', item = item)
 
+
+## ADD TO CART FUNCTION ##
 @app.route('/addtocart')
-def cart():
+def addtocart():
     # redirect user to login page if not logged in
     if 'userid' not in session:
         flash('Please log in or create an account.')
@@ -66,13 +64,33 @@ def cart():
     custID = str(session['userid'])  # temporary customer ID (unregistred user)
     prodID = str(request.args.get('id')) # productID
     qty = str(request.args.get('qty'))   # quantity
-
-    #TODO: Lägg till i en shopping cart fungerar. Lägg till till en existerande shopping cart fungerar inte.
-    # Add to shopping cart
-    insertTo('cart', 'custID, prodID, qty', custID+', '+prodID+', '+qty, mysql)
+    cond = 'custID = '+custID+' AND prodID = '+prodID   # insert/update condition
+    
+    # check if the product already exists in users cart
+    if exist('cart', cond):
+        inCart = getRow('cart', cond)
+        # increase the quantity of existing product
+        addqty = str(int(inCart[3])+int(qty))
+        updateIn('cart', 'qty', addqty, cond)
+    else:
+        # add new product to the cart
+        attr = 'custID, prodID, qty'
+        values = '%s, %s, %s' %(custID, prodID, qty)
+        insertTo('cart', attr, values)
 
     flash('Product has been added to the shopping cart.')
     return redirect('/product?id='+prodID)
+
+
+#TODO: Skapa en sida som visar alla poster i kundvagnen
+@app.route('/cart')
+def cart():
+    # redirect user to login page if not logged in
+    if 'userid' not in session:
+        flash('Please log in or create an account.')
+        return redirect('/login')
+    cart = getTable('cart')
+    return render_template('cart.html', cart = cart)
 
 
 # länk för att cleara session
@@ -84,7 +102,7 @@ def dropsess():
 # länk för att starta session
 @app.route('/startsess')
 def startsess():
-    session['userid'] = 1981
+    session['userid'] = 1891
     return redirect('/')
 
 if __name__ == "__main__":
