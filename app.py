@@ -42,11 +42,11 @@ def register():
             else:
                 cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)', (form.first_name.data,form.last_name.data,form.email.data,form.password.data,form.home_address.data,form.post_code.data,form.country.data,form.phone_number.data ))
                 mysql.connection.commit()
+            cur.close()
+            return redirect(url_for('home'))
     except Exception as e:
         return json.dumps({'error': str(e)})
-    finally:
-        cur.close()
-        return redirect(url_for('home'))
+
     return render_template('register.html', form=form)
 
 
