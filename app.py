@@ -4,7 +4,7 @@ from forms import RegistrationForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from SQLfunctions import *
 
-mysql = MySQL()
+
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'bdb878ef8ea259ef877a3686726cf4f9'
@@ -13,7 +13,7 @@ app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'Choss!95'
 app.config['MYSQL_DATABASE_DB'] = 'webshop'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mysql.init_app(app)
+mysql = MySQL(app)
 
 
 @app.route("/")
@@ -46,10 +46,10 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         if form.email.data == 'simon@hotmail.com' and form.password.data == 'password':
-            flash('You Are Now Logged In!', 'success')
+            #flash('You Are Now Logged In!', 'success')
             return redirect(url_for('home'))
         else:
-            flash('Invalid Email Or Password', 'danger')
+            #flash('Invalid Email Or Password', 'danger')
     return render_template('login.html', form=form)
 
 
@@ -57,7 +57,7 @@ def login():
 def addtocart():
     # redirect user to login page if not logged in
     if 'userid' not in session:
-        flash('Please log in or create an account.')
+        #flash('Please log in or create an account.')
         return redirect('/login')
 
     # attribute data for shoping cart
@@ -78,7 +78,7 @@ def addtocart():
         values = '%s, %s, %s' % (custID, prodID, qty)
         insertTo('cart', attr, values)
 
-    flash('Product has been added to the shopping cart.')
+    #flash('Product has been added to the shopping cart.')
     return redirect('/product?id=' + prodID)
 
 @app.route('/startsess')
