@@ -40,15 +40,15 @@ def register():
     return render_template('register.html', form=form)
 
 
-#@app.route("/login", methods=['GET', 'POST'])
+@app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         if form.email.data == 'simon@hotmail.com' and form.password.data == 'password':
-            #flash('You Are Now Logged In!', 'success')
+            flash('You Are Now Logged In!', 'success')
             return redirect(url_for('home'))
-        #else:
-            #flash('Invalid Email Or Password', 'danger')
+        else:
+            flash('Invalid Email Or Password', 'danger')
     return render_template('login.html', form=form)
 
 
@@ -56,7 +56,7 @@ def login():
 def addtocart():
     # redirect user to login page if not logged in
     if 'userid' not in session:
-        #flash('Please log in or create an account.')
+        flash('Please log in or create an account.')
         return redirect('/login')
 
     # attribute data for shoping cart
@@ -77,7 +77,7 @@ def addtocart():
         values = '%s, %s, %s' % (custID, prodID, qty)
         insertTo('cart', attr, values)
 
-    #flash('Product has been added to the shopping cart.')
+    flash('Product has been added to the shopping cart.')
     return redirect('/product?id=' + prodID)
 
 @app.route('/startsess')
