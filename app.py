@@ -3,6 +3,7 @@ from flask_mysqldb import MySQL
 from forms import RegistrationForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from SQLfunctions import *
+import MySQLdb.cursors
 
 
 app = Flask(__name__)
@@ -47,9 +48,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
-        query_string = "SELECT * FROM customers WHERE email = %s"
-        user_email = str(form.email.data)
-        cur.execute(query_string, user_email)
+        cur.execute('SELECT * FROM customers WHERE email = form.email.data')
         data = cur.fetchall()
 
         if len(data) > 0:
