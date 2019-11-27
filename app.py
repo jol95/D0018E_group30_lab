@@ -3,7 +3,6 @@ from flask_mysqldb import MySQL
 from forms import RegistrationForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from SQLfunctions import *
-import MySQLdb.cursors
 
 
 app = Flask(__name__)
@@ -64,11 +63,18 @@ def login():
     return render_template('login.html', form=form)
 
 
+@app.route("/customerMypage")
+def customerMypage():
+
+    return render_template('customerMypage.html')
+
+
+## ADD TO CART FUNCTION ##
 @app.route('/addtocart')
 def addtocart():
     # redirect user to login page if not logged in
     if 'userid' not in session:
-        flash('Please log in or create an account.')
+        flash('Please log in or create an account.', 'danger')
         return redirect('/login')
 
     # attribute data for shoping cart
@@ -89,8 +95,50 @@ def addtocart():
         values = '%s, %s, %s' % (custID, prodID, qty)
         insertTo('cart', attr, values)
 
-    flash('Product has been added to the shopping cart.')
+    flash('Product has been added to the shopping cart.', 'success')
     return redirect('/product?id=' + prodID)
+
+
+## CART PAGE ##
+@app.route('/cart')
+def cart():
+    # redirect user to login page if not logged in
+    if 'userid' not in session:
+        flash('Please log in or create an account.', 'danger')
+        return redirect('/login')
+    attr = 'cart.prodID, products.name, cart.qty'
+    join = 'products ON cart.prodID = products.prodID'
+    cond = 'cart.custID = 1891'
+    cart = innerJoin('cart', attr, join, cond)
+    lenofcart = len(cart)
+    return render_template('cart.html', cart = cart, lenofcart=lenofcart)
+
+## UPDATE CART FUNCTION ##
+@app.route('/updatecart')
+def updatecart():
+    # redirect user to login page if not logged in
+    if 'userid' not in session:
+        flash('Please log in or create an account.', 'danger')
+        return redirect('/login')
+
+    custID = str(session['userid'])  # temporary customer ID (unregistred user)
+    prodID = str(request.args.get('id')) # productID
+    qty = str(request.args.get('qty'))   # quantity
+    cond = 'custID = '+custID+' AND prodID = '+prodID   # insert/update condition
+    updateIn('cart', 'qty', qty, cond)
+    flash('The cart has been updated.', 'success')
+    return redirect('/cart')
+
+## CLEAR CART FUNCTION ##
+@app.route('/clearcart')
+def clearcart():
+    # redirect user to login page if not logged in
+    if 'userid' not in session:
+        flash('Please log in or create an account.', 'danger')
+        return redirect('/login')
+    deleteFrom('cart', 'custID='+str(session['userid']))
+    return redirect('/cart')
+
 
 @app.route('/startsess')
 def startsess():
@@ -102,7 +150,6 @@ def startsess():
 def logout():
     session.clear()
     return redirect('/')
-
 
 
 if __name__ == '__main__':
