@@ -36,7 +36,7 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
               {% if 'userid' in session: %}
-              <a class="nav-item nav-link" href="/login">My page</a>
+              <a class="nav-item nav-link" href="/customerMypage">My page</a>
               <a class="nae-item nav-link" href="/cart">Cart</a>
               <a class="nav-item nav-link" href="{{ url_for('logout')}}">Logout</a>
               {% else: %}
