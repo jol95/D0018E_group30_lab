@@ -1,5 +1,6 @@
 /* TABLE HEAD */
 .header {
+    float: left;
     font-size: 24pt;
 }
 
@@ -61,14 +62,19 @@ input.hidden {
     display: none;
 }
 
-/* FOOTER */
-.footer {
+/* MENU */
+.menu {
+    float: left;
     width: 100%;
-    float: right;
+    background: none;
 }
 
-.footer > div {
+.menu > div {
     display: block;
     padding: 10px;
-    float: right;
+    float: left;
+}
+
+input.searchbar {
+    width: 400px;
 }

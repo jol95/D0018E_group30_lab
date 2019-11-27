@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin/products.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="menu">
+    <div>
+        <form>
+            <input class="searchbar" type="text" value="Search for product name or item number">
+            <input type="submit" value="search">
+        </form>
+    </div>
+    <div><a href="#">Show all products</a></div>
+</div>
+<div class="header">Products</div>
+<div class="cartcontainer">
+    <div class="titlerow">
+        <div class="col1">ITEM NUMBER</div>
+        <div class="col2">NAME</div>
+        <div class="col3">IN STOCK</div>
+    </div>
+    {% for items in prod: %}
+    <div class="{{loop.cycle('itemrows', 'itemrows altrows')}}">
+        <div class="col1">{{ items.0 }}</div>
+        <div class="col2">{{ items.1 }}</div>
+        <div class="col3">{{ items.5 }} PCS</div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
