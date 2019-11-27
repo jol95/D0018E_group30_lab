@@ -63,11 +63,34 @@ def login():
     return render_template('login.html', form=form)
 
 
+@app.route("/getcustomerMypage")
+def getcustomerMypage():
+    if 'userid' not in session:
+        flash('Please log in or create an account.', 'danger')
+        return redirect('/login')
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM customers WHERE custID = %s', [session['userid']])
+    data = cur.fetchall()
+
+    data_dict = []
+    for x in data:
+        x_dict = {
+            'Firstname': x[1],
+            'Lastname': x[2],
+            'Email': x[3],
+            'Password': x[4],
+            'Address': x[5],
+            'Postcode': x[6],
+            'Country': x[7],
+            'Phone': x[8]
+        }
+        data_dict.append(x_dict)
+    return json.dumps(data_dict)
+
+
 @app.route("/customerMypage")
 def customerMypage():
-
     return render_template('customerMypage.html')
-
 
 ## ADD TO CART FUNCTION ##
 @app.route('/addtocart')
