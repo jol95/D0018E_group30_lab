@@ -78,12 +78,10 @@ def getcustomerMypage():
             'Firstname': x[1],
             'Lastname': x[2],
             'Email': x[3],
-            'Password': x[4],
             'Address': x[5],
             'Postcode': x[6],
             'Country': x[7],
-            'Phone': x[8]
-        }
+            'Phone': x[8]}
         data_dict.append(x_dict)
     return json.dumps(data_dict)
 
