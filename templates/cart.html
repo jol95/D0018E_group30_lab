@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/cart.css') }}">
+{% endblock%}
+
+{% block content %}
+<div class="header">Shopping cart</div>
+<div class="cartcontainer">
+    <div class="titlerow">
+        <div class="col1">ITEM NUMBER</div>
+        <div class="col2">NAME</div>
+        <div class="col3">QUANTITY</div>
+    </div>
+    {% if lenofcart <= 0:%}
+        <p>The shopping cart is empty.</p>
+    {% endif %}
+    {% for items in cart: %}
+    <div class="itemrows">
+        <div class="col1">{{items.0}}</div>
+        <div class="col2">{{items.1}}</div>
+        <div class="col3">
+            <form action="{{ url_for('updatecart') }}">
+                <input name="qty" value="{{items.2}}" class="col3" type="text">
+                <input name="id" value="{{items.0}}" class="hidden" type="text">
+                &nbsp;
+                <input type="submit" value="Update">
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<div class="footer">
+    <div>Checkout</div>
+    <div>
+        {# Prompt confim before clearing #}
+        {% if request.args.get('confirm'): %}
+        Are you sure? <a href="/clearcart">Yes</a> / <a href="/cart">No</a>
+        {% else: %}
+        <a href="/confirmclear">Clear</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
