@@ -1,20 +1,25 @@
 {% extends 'layout.html' %}
 
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/prodpage.css') }}">
+{% endblock %}
+
 {% block content %}
-{% for item in prod%}
 <div class="grid-container">
     <div class="img">
         <div class="img">
-            {% if item.4 == none %}
+            {% if item.4 == '' %}
             <img src="{{ url_for('static', filename='resources/noimg.jpg') }}" alt="noimg" class="prodimg"/>
             {% else %}
             <img src="{{ url_for('static', filename='resources/') }}{{ item.4 }}" alt="{{item.4}}" class="prodimg"/>
             {% endif %}
         </div>
     </div>
-    <div class="name"><h1>{{ item.1 }}</h1></div>
-    <div class="prodID">{{ item.0 }}</div>
+    <div class="name"><h1>{{item.1}}</h1></div>
+    <div class="prodID">{{item.0}}</div>
     <div class="desc">{{ item.2 }}</div>
+    <div class="addtocart"><a href="/addtocart?id={{item.0}}&qty=1">Add to cart</a></div>
 </div>
-{% endfor %}
+
 {% endblock content %}
+
