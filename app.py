@@ -98,7 +98,7 @@ def addtocart():
         inCart = getRow('cart', cond)
         # increase the quantity of existing product
         addqty = str(int(inCart[3])+int(qty))
-        updateIn('cart', 'qty', addqty, cond)
+        updateAll('cart', 'qty='+addqty, cond)
     else:
         # add new product to the cart
         attr = 'custID, prodID, qty'
@@ -169,7 +169,7 @@ def startsess():
     return redirect('/')
 
 
-## ADMIN PAGES ##
+## ADMIN - CUSTOMER PAGES ##
 @app.route('/admin/customers')
 def admin_customers():
     # denies access to admin pages if not admin
@@ -178,21 +178,62 @@ def admin_customers():
         return redirect('/')
     return render_template('admin/customers.html')
 
-@app.route('/admin/products')
+## ADMIN - PRODUCT PAGES ##
+@app.route('/admin/products', methods=['GET', 'POST'])
 def admin_products():
     # denies access to admin pages if not admin
     if 'userid' not in session or session['userid'] != 1891:
         flash('Permission denied!', 'danger')
         return redirect('/')
-    # product subpages
-    page = request.args.get('page') # page-path
-    res = getTable('products')      # product-start-page "shows all products"
 
-    # page: showall
-    if page == 'showall':
-        res = getTable('products')
-    return render_template('admin/products.html', prod=res)
+    # define page
+    page = 'products'
 
+    # initialize searchbar
+    form = adminProdSearch()
+
+    # seach by item number or product name
+    if request.method=='POST':
+        searchWord = str(form.search.data)
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT * FROM products WHERE name LIKE "%'+searchWord+'%" OR prodID LIKE "%'+searchWord+'%"')
+        res = cur.fetchall()
+        cur.close()
+    else:
+        res = getTable('products')      # default "show all products"
+
+    # error message on search
+    if len(res) == 0:
+        flash('Your search "'+form.search.data+'" did not match any product(s).', 'warning')
+
+    return render_template('admin/products.html', form=form, prod=res, p=page)
+
+@app.route('/admin/product/edit', methods=['GET', 'POST'])
+def admin_products_edit():
+    # denies access to admin pages if not admin
+    if 'userid' not in session or session['userid'] != 1891:
+        flash('Permission denied!', 'danger')
+        return redirect('/')
+    
+    # define page
+    page = 'Edit'
+
+    # initalize edit form
+    editform = adminProdEdit()
+
+    # update the product
+    if request.method == 'POST':
+        update = 'name=%s, desc=%s, price=%s, img=%s, stock=%s, category=%s, discount=%s' %(editform.name.data, editform.desc.data, editform.price.data, editform.img.data, editform.stock.data, editform.cat.data)
+        return update
+    # default show the product
+    else:
+        res = getRow('products', 'prodID ='+request.args.get('id'))
+
+    return render_template('admin/products.html', p=page, form=editform, item=res)
+    
+
+
+## ADMIN - ORDER PAGES ##
 @app.route('/admin/orders')
 def admin_orders():
     # denies access to admin pages if not admin

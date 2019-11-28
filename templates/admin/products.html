@@ -5,17 +5,21 @@
 {% endblock %}
 
 {% block content %}
+<div class="header">{{p}}</div>
+{% if p == 'products': %}
+{# PRODUCT LIST PAGE #}
 <div class="menu">
-    <div>
-        <form>
-            <input class="searchbar" type="text" value="Search for product name or item number">
-            <input type="submit" value="search">
-        </form>
-    </div>
-    <div><a href="#">Show all products</a></div>
+    <form method="POST" action="" class="menu">
+        <div>
+            {{form.search(class='searchbar', placeholder='Search by item number or product name')}}
+        </div>
+        <div>
+            {{form.submit()}}
+        </div>
+    </form>
+    <div><a href="{{ url_for('admin_products') }}">Show all products</a></div>
 </div>
-<div class="header">Products</div>
-<div class="cartcontainer">
+<div class="table">
     <div class="titlerow">
         <div class="col1">ITEM NUMBER</div>
         <div class="col2">NAME</div>
@@ -26,8 +30,50 @@
         <div class="col1">{{ items.0 }}</div>
         <div class="col2">{{ items.1 }}</div>
         <div class="col3">{{ items.5 }} PCS</div>
+        <div class="col3">
+            <a href="{{ url_for('admin_products_edit') }}?id={{ items.0}}">Edit</a>
+        </div>
     </div>
     {% endfor %}
 </div>
-
+{% else: %}
+{# PRODUCT EDIT PAGE #}
+<div class="table">
+    <div class="titlerow">Product: {{ item.1 }} Item#: {{ item.0 }}</div>
+    <form method="POST" action="">
+        <div class="itemrows">
+            {{form.name.label}}
+            {{form.name(class='form-control mb-2 mr-sm-2', value=item.1)}}
+        </div>
+        <div class="itemrows">
+            {{form.desc.label}}
+            {{form.desc(class='form-control mb-2 mr-sm-2', value=item.2)}}
+        </div>
+        <div class="itemrows">
+            {{form.price.label}}
+            {{form.price(class='form-control mb-2 mr-sm-2', value=item.3)}}
+        </div>
+        <div class="itemrows">
+            {{form.discount.label}}
+            {{form.discount(class='form-control mb-2 mr-sm-2', value=item.7)}}
+        </div>
+        <div class="itemrows">
+            {{form.stock.label}}
+            {{form.stock(class='form-control mb-2 mr-sm-2', value=item.5)}}
+        </div>
+        <div class="itemrows">
+            {{form.cat.label}}
+            {{form.cat(class='form-control mb-2 mr-sm-2', value=item.6)}}
+        </div>
+        <div class="itemrows">
+            {{form.img.label}}: {{item.4}}
+            {{ form.img(class='form-control mb-2 mr-sm-2', value=item.4) }}
+        </div>
+        <div class="itemrows">
+            {{form.submit(class='btn btn-primary mb-2')}}
+            <a href="{{ url_for('admin_products' )}}" class="btn btn-primary mb-2">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endif %}
 {% endblock %}

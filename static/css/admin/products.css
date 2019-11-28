@@ -2,24 +2,23 @@
 .header {
     float: left;
     font-size: 24pt;
+    text-transform: capitalize;
+}
+
+.table {
+    width: 100%;
 }
 
 .titlerow {
     float: left;
-    display: box;
     padding 5px;
     width: 100%;
     font: 11px, bold;
+    border-bottom: 1px solid black;
 }
 
 .titlerow > div {
     float: left;
-    border-bottom: 1px solid black;
-    padding: 5px;
-}
-
-.titlerow.t1 {
-    widht: 500px;
 }
 
 /* ITEM ROWS */
@@ -49,13 +48,7 @@
 }
 
 .col3 {
-    float: left;
     width: 170px;
-}
-
-input.col3 {
-    width: 50px;
-    height: 28px;
 }
 
 input.hidden {

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, IntegerField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, IntegerField, SubmitField, BooleanField, TextAreaField, FileField, DecimalField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
 
@@ -23,3 +23,20 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Remember Me')
 
     submit = SubmitField('Login')
+
+class adminProdSearch(FlaskForm):
+    search = StringField(validators=[DataRequired()])
+    submit = SubmitField('search')
+
+class adminProdEdit(FlaskForm):
+    name = StringField('Name')
+    desc = TextAreaField('Description')
+    price = IntegerField('Price')
+    img = FileField('Image')
+    stock = IntegerField('Stock')
+    cat = StringField('Category')
+    discount = DecimalField('Discount')
+
+    submit = SubmitField('Update')
+
+
