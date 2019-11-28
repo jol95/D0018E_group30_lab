@@ -55,8 +55,8 @@ def login():
 
         if len(data) > 0:
             if check_password_hash(str(data[0][4]), form.password.data):
-                login_user(data[0][1], remember=form.remember.data)
                 session['userid'] = data[0][0]
+                login_user(str(data[0][1]), remember=form.remember.data)
                 flash('You Are Now Logged In!', 'success')
                 return redirect(url_for('home'))
             else:
