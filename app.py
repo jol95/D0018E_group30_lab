@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #-*- coding: -utf-8 -*-
 # installed libs
 from flask import *
@@ -5,12 +6,19 @@ from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # created libs
+=======
+from flask import *
+from flask_mysqldb import MySQL
+from forms import RegistrationForm, LoginForm, ReviewForm
+from werkzeug.security import generate_password_hash, check_password_hash
+>>>>>>> osc
 from SQLfunctions import *
-from forms import *
+import datetime
 
 
 app = Flask(__name__)
-app.secret_key = "abc"
+
+app.config['SECRET_KEY'] = 'bdb878ef8ea259ef877a3686726cf4f9'
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
@@ -19,10 +27,13 @@ app.config['MYSQL_DB'] = 'webshop'
 
 mysql = MySQL(app)
 
+<<<<<<< HEAD
 #TODO: Kontroll om användaren redan finns i databasen.
 ## REGISTER PAGE ##
+=======
+>>>>>>> osc
 @app.route("/register", methods=['GET', 'POST'])
-def register():  
+def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
@@ -34,7 +45,6 @@ def register():
     return render_template('register.html', form=form)
 
 
-## LOGIN PAGE ##
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -47,7 +57,10 @@ def login():
         if len(data) > 0:
             if check_password_hash(str(data[0][4]), form.password.data):
                 session['userid'] = data[0][0]
+<<<<<<< HEAD
                 session['username'] = data[0][1]
+=======
+>>>>>>> osc
                 flash('You Are Now Logged In!', 'success')
                 return redirect('/')
             else:
@@ -56,6 +69,7 @@ def login():
             flash('Invalid Email Or Password', 'danger')
     return render_template('login.html', form=form)
 
+<<<<<<< HEAD
 
 @app.route("/customerMypage")
 def customerMypage():
@@ -63,6 +77,8 @@ def customerMypage():
     return render_template('customerMypage.html')
 
 
+=======
+>>>>>>> osc
 ## INDEX PAGE ##
 @app.route('/')
 def index():
@@ -72,11 +88,24 @@ def index():
 
 
 ## PRODUCT PAGE ##
-@app.route('/product')
+@app.route('/product', methods=['GET', 'POST'])
 def product():
+    form = ReviewForm()
     args = request.args
     item = getRow('products', 'prodID='+args.get("id"))
-    return render_template('productpage.html', item = item)
+    rev = getTable('reviews WHERE prodID=%s'%(item[0]))
+    ## SUBMITTING REVIEWS ##
+    if request.method=='POST':
+        prodID = item[0]
+        custID = str(session['userid'])
+        text = form.text.data
+        date = '12'
+        attr = 'prodID, custID, text, date'
+        val = '%s, %s, "%s", %s' %(prodID, custID, text, date)
+        insertTo('reviews', attr, val)
+        flash('Thank you for leaving a review!', 'success')
+        return redirect('/')
+    return render_template('productpage.html', item = item, form=form, rev=rev)
 
 
 ## ADD TO CART FUNCTION ##

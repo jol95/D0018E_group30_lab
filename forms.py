@@ -1,5 +1,9 @@
 from flask_wtf import FlaskForm
+<<<<<<< HEAD
 from wtforms import StringField, PasswordField, IntegerField, SubmitField, BooleanField, TextAreaField, FileField, DecimalField
+=======
+from wtforms import StringField, PasswordField, IntegerField, SubmitField, BooleanField, TextAreaField
+>>>>>>> osc
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
 
@@ -24,6 +28,7 @@ class LoginForm(FlaskForm):
 
     submit = SubmitField('Login')
 
+<<<<<<< HEAD
 class adminProdSearch(FlaskForm):
     search = StringField(validators=[DataRequired()])
     submit = SubmitField('search')
@@ -40,3 +45,9 @@ class adminProdEdit(FlaskForm):
     submit = SubmitField('Update')
 
 
+=======
+class ReviewForm(FlaskForm):
+    text = TextAreaField('', validators=[DataRequired()])
+
+    submit = SubmitField('Submit Review')
+>>>>>>> osc
