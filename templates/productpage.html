@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block content %}
+{# VISA PRODUKTEN PÅ SIDAN BRUSH #}
 <div class="grid-container">
     <div class="img">
         <div class="img">
@@ -19,6 +20,49 @@
     <div class="prodID">{{item.0}}</div>
     <div class="desc">{{ item.2 }}</div>
     <div class="addtocart"><a href="/addtocart?id={{item.0}}&qty=1">Add to cart</a></div>
+
 </div>
+
+{# VISA REVIEWS FÖR PRODUKTEN #}
+<div class ="grid-container">
+    {% for data in rev: %}
+        <div class="listreview">
+            {{ data.3 }}
+        </div>
+    {% endfor %}
+</div>
+
+
+{# FÖR ATT LÄMNA IN REVIEW #}
+{% if 'userid' in session %}
+    <div class="grid-container mt-4">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom">Feel free to leave a review!</legend>
+                <div class="form-group">
+                    {{ form.text.label(class="form-control-label") }}
+
+                    {% if form.text.errors %}
+                        {{ form.text(class="form-
+                        control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.text.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                         {{ form.text(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-outline-info") }}
+                </div>
+            </fieldset>
+        </form>
+    </div>
+{% endif %}
+
+
 
 {% endblock content %}

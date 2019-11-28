@@ -1,15 +1,14 @@
-#-*- coding: -utf-8 -*-
-# installed libs
-from flask import Flask, render_template, request, session, flash, redirect, url_for
+from flask import *
 from flask_mysqldb import MySQL
-
-# created libs
+from forms import RegistrationForm, LoginForm, ReviewForm
+from werkzeug.security import generate_password_hash, check_password_hash
 from SQLfunctions import *
-from forms import *
+import datetime
 
 # Initiate Flask app
 app = Flask(__name__)
-app.secret_key = "abc"
+
+app.config['SECRET_KEY'] = 'bdb878ef8ea259ef877a3686726cf4f9'
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
@@ -18,31 +17,38 @@ app.config['MYSQL_DB'] = 'webshop'
 
 mysql = MySQL(app)
 
-## REGISTER PAGE ##
 @app.route("/register", methods=['GET', 'POST'])
-def register():  
+def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
-        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)', (form.first_name.data,form.last_name.data,form.email.data,form.password.data,form.home_address.data,form.post_code.data,form.country.data,form.phone_number.data ))
+        hashed_password = generate_password_hash(form.password.data)
+        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)',(form.first_name.data, form.last_name.data, form.email.data, hashed_password, form.home_address.data,form.post_code.data, form.country.data, form.phone_number.data))
         mysql.connection.commit()
-        #flash(f'Account created for {form.email.data}!', 'success')
-        return redirect(url_for('/'))
+        flash('You Have Created An Account!', 'success')
+        return redirect('/')
     return render_template('register.html', form=form)
 
 
-## LOGIN PAGE ##
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        if form.email.data == 'simon@hotmail.com' and form.password.data == 'password':
-            flash('You Are Now Logged In!', 'success')
-            return redirect(url_for('index'))
+        cur = mysql.connection.cursor()
+        email = form.email.data
+        cur.execute('SELECT * FROM customers WHERE email = %s', [email])
+        data = cur.fetchall()
+
+        if len(data) > 0:
+            if check_password_hash(str(data[0][4]), form.password.data):
+                session['userid'] = data[0][0]
+                flash('You Are Now Logged In!', 'success')
+                return redirect('/')
+            else:
+                flash('Invalid Email Or Password', 'danger')
         else:
             flash('Invalid Email Or Password', 'danger')
     return render_template('login.html', form=form)
-
 
 ## INDEX PAGE ##
 @app.route('/')
@@ -53,11 +59,24 @@ def index():
 
 
 ## PRODUCT PAGE ##
-@app.route('/product')
+@app.route('/product', methods=['GET', 'POST'])
 def product():
+    form = ReviewForm()
     args = request.args
     item = getRow('products', 'prodID='+args.get("id"))
-    return render_template('productpage.html', item = item)
+    rev = getTable('reviews WHERE prodID=%s'%(item[0]))
+    ## SUBMITTING REVIEWS ##
+    if request.method=='POST':
+        prodID = item[0]
+        custID = str(session['userid'])
+        text = form.text.data
+        date = '12'
+        attr = 'prodID, custID, text, date'
+        val = '%s, %s, "%s", %s' %(prodID, custID, text, date)
+        insertTo('reviews', attr, val)
+        flash('Thank you for leaving a review!', 'success')
+        return redirect('/')
+    return render_template('productpage.html', item = item, form=form, rev=rev)
 
 
 ## ADD TO CART FUNCTION ##
