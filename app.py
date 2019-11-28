@@ -169,7 +169,7 @@ def confirmclear():
     return redirect('/cart?confirm=True')
 
 
-# länk för att starta admin session
+
 @app.route('/startadmin')
 def startsess():
     session['userid'] = 1891
