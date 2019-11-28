@@ -9,9 +9,9 @@
     <div class="img">
         <div class="img">
             {% if item.4 == '' %}
-            <img src="{{ url_for('static', filename='resources/noimg.jpg') }}" alt="noimg" class="prodimg"/>
+            <img src="{{ url_for('static', filename='resources/noimg.jpg') }}" alt="noimg" class="img-thumbnail"/>
             {% else %}
-            <img src="{{ url_for('static', filename='resources/') }}{{ item.4 }}" alt="{{item.4}}" class="prodimg"/>
+            <img src="{{ url_for('static', filename='resources/') }}{{ item.4 }}" alt="{{item.4}}" class="img-thumbnail"/>
             {% endif %}
         </div>
     </div>

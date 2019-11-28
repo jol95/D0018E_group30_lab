@@ -1,11 +1,16 @@
 /* TABLE HEAD */
 .header {
+    float: left;
     font-size: 24pt;
+    text-transform: capitalize;
+}
+
+.table {
+    width: 100%;
 }
 
 .titlerow {
     float: left;
-    display: box;
     padding 5px;
     width: 100%;
     font: 11px, bold;
@@ -14,11 +19,6 @@
 
 .titlerow > div {
     float: left;
-    padding: 5px;
-}
-
-.titlerow.t1 {
-    widht: 500px;
 }
 
 /* ITEM ROWS */
@@ -48,30 +48,26 @@
 }
 
 .col3 {
-    float: left;
     width: 170px;
-}
-
-input.col3 {
-    border-radius: 5px;
-    border: 1px solid rgb(183, 180, 180);
-    padding: 5px;
-    width: 50px;
-    height: 28px;
 }
 
 input.hidden {
     display: none;
 }
 
-/* FOOTER */
-.footer {
+/* MENU */
+.menu {
+    float: left;
     width: 100%;
-    float: right;
+    background: none;
 }
 
-.footer > div {
+.menu > div {
     display: block;
     padding: 10px;
-    float: right;
+    float: left;
+}
+
+input.searchbar {
+    width: 400px;
 }

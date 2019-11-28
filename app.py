@@ -1,7 +1,8 @@
 #-*- coding: -utf-8 -*-
 # installed libs
-from flask import Flask, render_template, request, session, flash, redirect, url_for
+from flask import *
 from flask_mysqldb import MySQL
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # created libs
 from SQLfunctions import *
@@ -18,16 +19,18 @@ app.config['MYSQL_DB'] = 'webshop'
 
 mysql = MySQL(app)
 
+#TODO: Kontroll om användaren redan finns i databasen.
 ## REGISTER PAGE ##
 @app.route("/register", methods=['GET', 'POST'])
 def register():  
     form = RegistrationForm()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
-        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)', (form.first_name.data,form.last_name.data,form.email.data,form.password.data,form.home_address.data,form.post_code.data,form.country.data,form.phone_number.data ))
+        hashed_password = generate_password_hash(form.password.data)
+        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)',(form.first_name.data, form.last_name.data, form.email.data, hashed_password, form.home_address.data,form.post_code.data, form.country.data, form.phone_number.data))
         mysql.connection.commit()
-        #flash(f'Account created for {form.email.data}!', 'success')
-        return redirect(url_for('/'))
+        flash('You Have Created An Account!', 'success')
+        return redirect('/')
     return render_template('register.html', form=form)
 
 
@@ -36,12 +39,28 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        if form.email.data == 'simon@hotmail.com' and form.password.data == 'password':
-            flash('You Are Now Logged In!', 'success')
-            return redirect(url_for('index'))
+        cur = mysql.connection.cursor()
+        email = form.email.data
+        cur.execute('SELECT * FROM customers WHERE email = %s', [email])
+        data = cur.fetchall()
+
+        if len(data) > 0:
+            if check_password_hash(str(data[0][4]), form.password.data):
+                session['userid'] = data[0][0]
+                session['username'] = data[0][1]
+                flash('You Are Now Logged In!', 'success')
+                return redirect('/')
+            else:
+                flash('Invalid Email Or Password', 'danger')
         else:
             flash('Invalid Email Or Password', 'danger')
     return render_template('login.html', form=form)
+
+
+@app.route("/customerMypage")
+def customerMypage():
+
+    return render_template('customerMypage.html')
 
 
 ## INDEX PAGE ##
@@ -79,7 +98,7 @@ def addtocart():
         inCart = getRow('cart', cond)
         # increase the quantity of existing product
         addqty = str(int(inCart[3])+int(qty))
-        updateIn('cart', 'qty', addqty, cond)
+        updateAll('cart', 'qty='+addqty, cond)
     else:
         # add new product to the cart
         attr = 'custID, prodID, qty'
@@ -89,6 +108,8 @@ def addtocart():
     flash('Product has been added to the shopping cart.', 'success')
     return redirect('/product?id='+prodID)
 
+
+#TODO: Bekräfta order funktion
 ## CART PAGE ##
 @app.route('/cart')
 def cart():
@@ -98,7 +119,11 @@ def cart():
         return redirect('/login')
     attr = 'cart.prodID, products.name, cart.qty'
     join = 'products ON cart.prodID = products.prodID'
+<<<<<<< HEAD
     cond = 'cart.custID ='+str(session['userid'])
+=======
+    cond = 'cart.custID = '+str(session['userid'])
+>>>>>>> cho
     cart = innerJoin('cart', attr, join, cond)
     lenofcart = len(cart)
     return render_template('cart.html', cart = cart, lenofcart=lenofcart)
@@ -140,11 +165,93 @@ def logout():
     session.clear()
     return redirect('/')
 
-# länk för att starta session
-@app.route('/startsess')
+# länk för att starta admin session
+@app.route('/startadmin')
 def startsess():
     session['userid'] = 1891
+    session['username'] = 'admin'
     return redirect('/')
 
+<<<<<<< HEAD
 if __name__ == '__main__':
     app.run(debug=True)
+=======
+
+## ADMIN - CUSTOMER PAGES ##
+@app.route('/admin/customers')
+def admin_customers():
+    # denies access to admin pages if not admin
+    if 'userid' not in session or session['userid'] != 1891:
+        flash('Permission denied!', 'danger')
+        return redirect('/')
+    return render_template('admin/customers.html')
+
+## ADMIN - PRODUCT PAGES ##
+@app.route('/admin/products', methods=['GET', 'POST'])
+def admin_products():
+    # denies access to admin pages if not admin
+    if 'userid' not in session or session['userid'] != 1891:
+        flash('Permission denied!', 'danger')
+        return redirect('/')
+
+    # define page
+    page = 'products'
+
+    # initialize searchbar
+    form = adminProdSearch()
+
+    # seach by item number or product name
+    if request.method=='POST':
+        searchWord = str(form.search.data)
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT * FROM products WHERE name LIKE "%'+searchWord+'%" OR prodID LIKE "%'+searchWord+'%"')
+        res = cur.fetchall()
+        cur.close()
+    else:
+        res = getTable('products')      # default "show all products"
+
+    # error message on search
+    if len(res) == 0:
+        flash('Your search "'+form.search.data+'" did not match any product(s).', 'warning')
+
+    return render_template('admin/products.html', form=form, prod=res, p=page)
+
+@app.route('/admin/product/edit', methods=['GET', 'POST'])
+def admin_products_edit():
+    # denies access to admin pages if not admin
+    if 'userid' not in session or session['userid'] != 1891:
+        flash('Permission denied!', 'danger')
+        return redirect('/')
+    
+    # define page
+    page = 'Edit'
+
+    # initalize edit form
+    editform = adminProdEdit()
+
+    # update the product
+    if request.method == 'POST':
+        update = 'name="%s", desc="%s", price=%s, img="%s", stock=%s, category=%s, discount=%s' %(editform.name.data, editform.desc.data, editform.price.data, editform.img.data, editform.stock.data, editform.cat.data, editform.discount.data)
+        cond = 'prodID = %s' %(request.args.get('prodID'))
+        return updateAll('products', update, cond)
+    # default show the product
+    else:
+        res = getRow('products', 'prodID ='+request.args.get('id'))
+
+    return render_template('admin/products.html', p=page, form=editform, item=res)
+    
+
+
+## ADMIN - ORDER PAGES ##
+@app.route('/admin/orders')
+def admin_orders():
+    # denies access to admin pages if not admin
+    if 'userid' not in session or session['userid'] != 1891:
+        flash('Permission denied!', 'danger')
+        return redirect('/')
+
+    return render_template('admin/orders.html')
+
+if __name__ == "__main__":
+	app.run(debug = True)
+>>>>>>> cho
