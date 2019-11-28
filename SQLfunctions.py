@@ -59,6 +59,18 @@ def updateIn(table, column, value, condition):
     cur.close()
     return query
 
+<<<<<<< HEAD
+=======
+# Update row in given table and columns with specified condition
+def updateAll(table, update, condition):
+    query = 'UPDATE '+table+' SET '+update+' WHERE '+condition
+    cur = mysql.cursor()
+    cur.execute(query)
+    mysql.commit()
+    cur.close()
+    return query
+
+>>>>>>> master
 # delete from given tabel with specified condition
 def deleteFrom(table, condition):
     query = 'DELETE FROM '+table+' WHERE '+condition

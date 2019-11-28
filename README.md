@@ -1,4 +1,18 @@
 # D0018E_group30_lab
+### pip install dessa lib ###
+- flask
+- flask-mysql
+- forms
+- flask_wtf
+- wtforms
+
+
+## Test databas
+Bygg databasen genom att köra 'buildDB.sql' i terminalen.
+
+1. cd till root katalogen
+2. kör kommandot 'mysql -u root -p'
+3. kör kommandot 'source buildDB.sql'
 
 
 ## Anslut till AWS ##
@@ -20,14 +34,3 @@ user = root
 password = Choss!95
 
 database = webshop
-
-## CREATE PRODUCT TABLE ##
-
-CREATE TABLE IF NOT EXISTS `webshop`.`products` (
-  `prodID` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(60) NOT NULL,
-  `desc` MEDIUMTEXT NULL,
-  `price` INT NOT NULL,
-  `img` VARCHAR(45) NULL,
-  PRIMARY KEY (`prodID`))
-ENGINE = InnoDB

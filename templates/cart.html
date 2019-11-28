@@ -16,7 +16,11 @@
         <p>The shopping cart is empty.</p>
     {% endif %}
     {% for items in cart: %}
+<<<<<<< HEAD
     <div class="itemrows">
+=======
+    <div class="{{loop.cycle('itemrows', 'itemrows altrows')}}">
+>>>>>>> master
         <div class="col1">{{items.0}}</div>
         <div class="col2">{{items.1}}</div>
         <div class="col3">

@@ -37,7 +37,11 @@
             <div class="navbar-nav">
               {% if 'userid' in session: %}
               <div class="dropdown">
+<<<<<<< HEAD
                 <button class="dropbtn">Welcome, {{ session['username'] }}!</button>
+=======
+                <button class="dropbtn" data-toggle="dropdown">Welcome, {{ session['username'] }}!</button>
+>>>>>>> master
                 <div class="dropdown-content">
                   {% if session.userid == 1891: %}
                   {# ADMIN DROPDOWN#}
@@ -47,7 +51,11 @@
                   {% else:%}
                   <a href="/cart">Cart</a>
                   <a href="#">Orders</a>
+<<<<<<< HEAD
                   <a href="/customerMypage">My page</a>
+=======
+                  <a href="#">My page</a>
+>>>>>>> master
                   {% endif %}
                   <a href="/logout">Logout</a>
                 </div>
@@ -68,7 +76,7 @@
 
     <main role="main" class="container">
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
           {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %}
                   {% for category, message in messages %}
@@ -82,17 +90,19 @@
           {% endblock %}
         </div>
 
-
-        <div class="col-md-4">
+        <!-- <div class="col-md-4">
           <div class="content-section">
             {% block sidebar %}
             {% endblock %}
           </div>
-        </div>
+        </div> -->
       </div>
     </main>
+<<<<<<< HEAD
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+=======
+>>>>>>> master
 </body>
 </html>

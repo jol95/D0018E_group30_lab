@@ -1,0 +1,73 @@
+/* TABLE HEAD */
+.header {
+    float: left;
+    font-size: 24pt;
+    text-transform: capitalize;
+}
+
+.table {
+    width: 100%;
+}
+
+.titlerow {
+    float: left;
+    padding 5px;
+    width: 100%;
+    font: 11px, bold;
+    border-bottom: 1px solid black;
+}
+
+.titlerow > div {
+    float: left;
+}
+
+/* ITEM ROWS */
+.itemrows {
+    float: left;
+    display: box;
+    width: 100%;
+}
+
+.altrows {
+    background-color: #d8d8d8;
+}
+
+.itemrows > div {
+    float: left;
+    padding: 5px;
+}
+
+.col1 {
+    width: 150px;
+    margin: 0px;
+}
+
+.col2 {
+    width: 400px;
+    margin: 0px;
+}
+
+.col3 {
+    width: 170px;
+}
+
+input.hidden {
+    display: none;
+}
+
+/* MENU */
+.menu {
+    float: left;
+    width: 100%;
+    background: none;
+}
+
+.menu > div {
+    display: block;
+    padding: 10px;
+    float: left;
+}
+
+input.searchbar {
+    width: 400px;
+}

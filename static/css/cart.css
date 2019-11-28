@@ -1,0 +1,77 @@
+/* TABLE HEAD */
+.header {
+    font-size: 24pt;
+}
+
+.titlerow {
+    float: left;
+    display: box;
+    padding 5px;
+    width: 100%;
+    font: 11px, bold;
+    border-bottom: 1px solid black;
+}
+
+.titlerow > div {
+    float: left;
+    padding: 5px;
+}
+
+.titlerow.t1 {
+    widht: 500px;
+}
+
+/* ITEM ROWS */
+.itemrows {
+    float: left;
+    display: box;
+    width: 100%;
+}
+
+.altrows {
+    background-color: #d8d8d8;
+}
+
+.itemrows > div {
+    float: left;
+    padding: 5px;
+}
+
+.col1 {
+    width: 150px;
+    margin: 0px;
+}
+
+.col2 {
+    width: 400px;
+    margin: 0px;
+}
+
+.col3 {
+    float: left;
+    width: 170px;
+}
+
+input.col3 {
+    border-radius: 5px;
+    border: 1px solid rgb(183, 180, 180);
+    padding: 5px;
+    width: 50px;
+    height: 28px;
+}
+
+input.hidden {
+    display: none;
+}
+
+/* FOOTER */
+.footer {
+    width: 100%;
+    float: right;
+}
+
+.footer > div {
+    display: block;
+    padding: 10px;
+    float: right;
+}

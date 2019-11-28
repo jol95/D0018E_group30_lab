@@ -10,10 +10,10 @@
     <a href="/product?id={{items.0}}" titel="{{ items.1 }}">
     <div class="item">
         <div class="img">
-            {% if items.4 == none %}
-            <img src="{{ url_for('static', filename='resources/noimg.jpg') }}" alt="noimg" class="prodimg"/>
+            {% if items.4 == '' %}
+            <img src="{{ url_for('static', filename='resources/noimg.jpg') }}" alt="noimg" class="img-rounded" width="150" height="150"/>
             {% else %}
-            <img src="{{ url_for('static', filename='resources/') }}{{ items.4 }}" alt="{{items.4}}" class="prodimg"/>
+            <img src="{{ url_for('static', filename='resources/') }}{{ items.4 }}" alt="{{items.4}}" class="img-rounded" width="150" height="150"/>
             {% endif %}
         </div>
         <div class="name">{{items.1}}</div>
@@ -23,6 +23,4 @@
     </a>
     {% endfor %}
 </div>
-
-{% endblock content%}
-
+{% endblock content %}
