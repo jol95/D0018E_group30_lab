@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+    {% block stylesheets %}
+        <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+    {% endblock%}
+
     <script src="../static/jquery-1.11.2.js"></script>
     <script>
         $(function() {
