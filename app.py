@@ -223,8 +223,9 @@ def admin_products_edit():
 
     # update the product
     if request.method == 'POST':
-        update = 'name=%s, desc=%s, price=%s, img=%s, stock=%s, category=%s, discount=%s' %(editform.name.data, editform.desc.data, editform.price.data, editform.img.data, editform.stock.data, editform.cat.data)
-        return update
+        update = 'name="%s", desc="%s", price=%s, img="%s", stock=%s, category=%s, discount=%s' %(editform.name.data, editform.desc.data, editform.price.data, editform.img.data, editform.stock.data, editform.cat.data, editform.discount.data)
+        cond = 'prodID = %s' %(request.args.get('prodID'))
+        return updateAll('products', update, cond)
     # default show the product
     else:
         res = getRow('products', 'prodID ='+request.args.get('id'))
@@ -240,6 +241,7 @@ def admin_orders():
     if 'userid' not in session or session['userid'] != 1891:
         flash('Permission denied!', 'danger')
         return redirect('/')
+
     return render_template('admin/orders.html')
 
 if __name__ == "__main__":

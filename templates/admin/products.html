@@ -68,6 +68,7 @@
         <div class="itemrows">
             {{form.img.label}}: {{item.4}}
             {{ form.img(class='form-control mb-2 mr-sm-2', value=item.4) }}
+            <input name="prodID" type="text" value="{{ item.0 }}" style="display: none;">
         </div>
         <div class="itemrows">
             {{form.submit(class='btn btn-primary mb-2')}}
