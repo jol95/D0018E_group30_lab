@@ -3,7 +3,7 @@ from flask_mysqldb import MySQL
 from forms import RegistrationForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from SQLfunctions import *
-from flask_login import login_user
+from flask import json
 
 
 app = Flask(__name__)
@@ -56,7 +56,6 @@ def login():
         if len(data) > 0:
             if check_password_hash(str(data[0][4]), form.password.data):
                 session['userid'] = data[0][0]
-                login_user(str(data[0][1]), remember=form.remember.data)
                 flash('You Are Now Logged In!', 'success')
                 return redirect(url_for('home'))
             else:
