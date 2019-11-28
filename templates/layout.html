@@ -36,9 +36,26 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
               {% if 'userid' in session: %}
-              <a class="nav-item nav-link" href="/customerMypage">My page</a>
-              <a class="nae-item nav-link" href="/cart">Cart</a>
+              <div class="dropdown">
+                <button class="dropbtn">Welcome, {{ session['username'] }}!</button>
+                <div class="dropdown-content">
+                  {% if session.userid == 1891: %}
+                  {# ADMIN DROPDOWN#}
+                  <a href="/admin/orders">Orders</a>
+                  <a href="/admin/products">Products</a>
+                  <a href="/admin/customers">Customers</a>
+                  {% else:%}
+                  <a href="/cart">Cart</a>
+                  <a href="#">Orders</a>
+                  <a href="/customerMypage">My page</a>
+                  {% endif %}
+                  <a href="/logout">Logout</a>
+                </div>
+              </div>
+              {# note: this is out-commented
+              <a class="nav-item nav-link" href="/cart">Cart</a>
               <a class="nav-item nav-link" href="{{ url_for('logout')}}">Logout</a>
+              #}
               {% else: %}
               <a class="nav-item nav-link" href="{{ url_for('login')}}">Login</a>
               <a class="nav-item nav-link" href="/register">Register</a>
