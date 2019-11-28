@@ -3,6 +3,7 @@ from flask_mysqldb import MySQL
 from forms import RegistrationForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from SQLfunctions import *
+from flask_login import login_user
 
 
 app = Flask(__name__)
@@ -16,17 +17,18 @@ app.config['MYSQL_HOST'] = 'localhost'
 mysql = MySQL(app)
 
 
+
 @app.route("/")
 @app.route("/home")
 def home():
     return render_template('index.html')
 
 
-@app.route("/products")
-def products():
+@app.route("/product")
+def product():
     args = request.args
     item = getRow('products', 'prodID=' + args.get("id"))
-    return render_template('products.html', item=item)
+    return render_template('productpage.html', item=item)
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -53,6 +55,7 @@ def login():
 
         if len(data) > 0:
             if check_password_hash(str(data[0][4]), form.password.data):
+                login_user(data[0][1], remember=form.remember.data)
                 session['userid'] = data[0][0]
                 flash('You Are Now Logged In!', 'success')
                 return redirect(url_for('home'))
@@ -161,10 +164,52 @@ def clearcart():
     return redirect('/cart')
 
 
-@app.route('/startsess')
+@app.route('/confirmclear')
+def confirmclear():
+    return redirect('/cart?confirm=True')
+
+
+# länk för att starta admin session
+@app.route('/startadmin')
 def startsess():
     session['userid'] = 1891
+    session['username'] = 'admin'
     return redirect('/')
+
+
+## ADMIN PAGES ##
+@app.route('/admin/customers')
+def admin_customers():
+    # denies access to admin pages if not admin
+    if 'userid' not in session or session['userid'] != 1891:
+        flash('Permission denied!', 'danger')
+        return redirect('/')
+    return render_template('admin/customers.html')
+
+
+@app.route('/admin/products')
+def admin_products():
+    # denies access to admin pages if not admin
+    if 'userid' not in session or session['userid'] != 1891:
+        flash('Permission denied!', 'danger')
+        return redirect('/')
+    # product subpages
+    page = request.args.get('page') # page-path
+    res = getTable('products')      # product-start-page "shows all products"
+
+    # page: showall
+    if page == 'showall':
+        res = getTable('products')
+    return render_template('admin/productpage.html', prod=res)
+
+
+@app.route('/admin/orders')
+def admin_orders():
+    # denies access to admin pages if not admin
+    if 'userid' not in session or session['userid'] != 1891:
+        flash('Permission denied!', 'danger')
+        return redirect('/')
+    return render_template('admin/orders.html')
 
 
 @app.route('/logout')
