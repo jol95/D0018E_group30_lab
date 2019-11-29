@@ -25,12 +25,16 @@ mysql = MySQL(app)
 #TODO: Kontroll om användaren redan finns i databasen.
 ## REGISTER PAGE ##
 @app.route("/register", methods=['GET', 'POST'])
-def register():
+def register():  
     form = RegistrationForm()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
+        profile_pic = 'default.jpg'
         hashed_password = generate_password_hash(form.password.data)
-        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)',(form.first_name.data, form.last_name.data, form.email.data, hashed_password, form.home_address.data,form.post_code.data, form.country.data, form.phone_number.data))
+        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno, profilepic)'
+                    ' VALUE(%s,%s,%s,%s,%s,%s,%s, %s, %s)',(form.first_name.data, form.last_name.data, form.email.data,
+                                                        hashed_password, form.home_address.data,form.post_code.data,
+                                                        form.country.data, form.phone_number.data, profile_pic))
         mysql.connection.commit()
         flash('You Have Created An Account!', 'success')
         return redirect('/')
@@ -78,7 +82,13 @@ def product():
     form = ReviewForm()
     args = request.args
     item = getRow('products', 'prodID='+args.get("id"))
-    rev = getTable('reviews WHERE prodID=%s'%(item[0]))
+
+    ## GET REVIEWS ##
+    attr = 'customers.firstname, reviews.date, reviews.text'
+    join = 'customers ON reviews.custID = customers.custID'
+    cond = 'reviews.prodID=%s' %(item[0])
+    rev = innerJoin('reviews', attr, join, cond)
+
     ## SUBMITTING REVIEWS ##
     if request.method=='POST':
         prodID = item[0]
@@ -221,6 +231,7 @@ def admin_products():
 
     return render_template('admin/products.html', form=form, prod=res, p=page)
 
+#ADMIN - EDIT PRODUCT PAGE#
 @app.route('/admin/product/edit', methods=['GET', 'POST'])
 def admin_products_edit():
     # denies access to admin pages if not admin
@@ -229,7 +240,7 @@ def admin_products_edit():
         return redirect('/')
     
     # define page
-    page = 'Edit'
+    page = 'edit'
 
     # initalize edit form
     editform = adminProdEdit()
@@ -245,14 +256,61 @@ def admin_products_edit():
         stock = str(editform.stock.data)
         cat = str(editform.cat.data)
         disc = str(editform.discount.data)
-        # update = 'name='+name+', desc='+desc+', price='+price+', img='+img+', stock='+stock+', category='+cat+', discount='+disc
         update = 'a.name="%s", a.desc="%s", a.price=%s, a.img="%s", a.stock=%s, a.category="%s", a.discount=%s' %(name, desc, price, img, stock, cat, disc)
         cond = 'prodID = %s' %(str(request.form.get('prodID')))
         updateAll('products as a', update, cond)
         flash('Update sucessfull!', 'success')
         return redirect('/admin/product/edit?id='+str(res[0]))
-
     return render_template('admin/products.html', p=page, form=editform, item=res)
+
+## ADMIN - ADD PRODUCT PAGE ##
+@app.route('/admin/product/add', methods=['GET', 'POST'])
+def admin_products_add():
+    # denies access to admin pages if not admin
+    if 'userid' not in session or session['userid'] != 1891:
+        flash('Permission denied!', 'danger')
+        return redirect('/')
+    
+    # define page
+    page = 'add'
+
+    # initialize add-form (same as edit-form)
+    addform = adminProdEdit()
+
+    # add the product
+    if request.method == 'POST':
+        # from data
+        name = str(addform.name.data)
+        desc = addform.desc.data
+        price = str(addform.price.data) if str(addform.price.data) != "" else '0'
+        img = str(addform.img.data) if str(addform.img.data) !="" else 'noimg.jpg'
+        stock = str(addform.stock.data) if str(addform.stock.data) != "" else '0'
+        cat = str(addform.cat.data) if str(addform.cat.data) != "" else ''
+        
+        # product table attributes and values
+        attr = '`name`, `price`, `stock`, `img`, `category`, `desc`, `discount`'
+        val = '"%s", %s, %s, "%s", %s, "%s", 0' %(name, price, stock, img, cat, desc)
+        res = insertTo('products', attr, val)
+
+        # flash success to user
+        flash('The product has been added!', 'success')
+        return redirect(url_for('admin_products'))
+    
+    return render_template('admin/products.html', p=page, form=addform)
+
+## ADMIN - DELETE PRODUCT FUNCTION ##
+@app.route('/admin/product/delete')
+def admin_products_delete():
+    # denies access to admin pages if not admin
+    if 'userid' not in session or session['userid'] != 1891:
+        flash('Permission denied!', 'danger')
+        return redirect('/')
+    
+    # delete the product and flash the user on success
+    removeProd = request.args.get('id')
+    deleteFrom('products', 'prodID='+removeProd)
+    flash('Item# '+removeProd+' has been successfully removed!', 'success')
+    return redirect(url_for('admin_products'))
 
 ## ADMIN - ORDER PAGES ##
 @app.route('/admin/orders')
@@ -261,7 +319,6 @@ def admin_orders():
     if 'userid' not in session or session['userid'] != 1891:
         flash('Permission denied!', 'danger')
         return redirect('/')
-
     return render_template('admin/orders.html')
 
 if __name__ == "__main__":
