@@ -68,6 +68,20 @@ input.hidden {
     float: left;
 }
 
+ul.menu-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.menu-list > li {
+    float: left;
+    padding-right: 20px;
+}
+
+.menu-list > a:hover{
+    display: block;
+    background-color: blue;
+}
 input.searchbar {
     width: 400px;
 }

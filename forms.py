@@ -44,8 +44,3 @@ class adminProdEdit(FlaskForm):
     submit = SubmitField('Update')
 
 
-class ReviewForm(FlaskForm):
-    text = TextAreaField('', validators=[DataRequired()])
-
-    submit = SubmitField('Submit Review')
-

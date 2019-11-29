@@ -27,7 +27,13 @@
 <div class ="grid-container">
     {% for data in rev: %}
         <div class="listreview">
-            {{ data.3 }}
+            User: {{ data.0 }}
+        </div>
+        <div class="listreview">
+            Date: {{ data.1 }}
+        </div>
+        <div class="listreview">
+            Comment: {{ data.2 }}
         </div>
     {% endfor %}
 </div>
