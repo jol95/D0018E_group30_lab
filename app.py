@@ -76,11 +76,24 @@ def index():
 
 
 ## PRODUCT PAGE ##
-@app.route('/product')
+@app.route('/product', methods=['GET', 'POST'])
 def product():
+    form = ReviewForm()
     args = request.args
     item = getRow('products', 'prodID='+args.get("id"))
-    return render_template('productpage.html', item = item)
+    rev = getTable('reviews WHERE prodID=%s'%(item[0]))
+    ## SUBMITTING REVIEWS ##
+    if request.method=='POST':
+        prodID = item[0]
+        custID = str(session['userid'])
+        text = form.text.data
+        date = '12'
+        attr = 'prodID, custID, text, date'
+        val = '%s, %s, "%s", %s' %(prodID, custID, text, date)
+        insertTo('reviews', attr, val)
+        flash('Thank you for leaving a review!', 'success')
+        return redirect('/product?id=%s' %item[0])
+    return render_template('productpage.html', item = item, form=form, rev=rev)
 
 
 ## ADD TO CART FUNCTION ##
