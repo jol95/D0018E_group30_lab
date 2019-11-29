@@ -26,9 +26,8 @@ class LoginForm(FlaskForm):
 
 class ReviewForm(FlaskForm):
     text = TextAreaField('', validators=[DataRequired()])
-
     submit = SubmitField('Submit Review')
-
+    
 class adminProdSearch(FlaskForm):
     search = StringField(validators=[DataRequired()])
     submit = SubmitField('search')
@@ -44,4 +43,9 @@ class adminProdEdit(FlaskForm):
 
     submit = SubmitField('Update')
 
+
+class ReviewForm(FlaskForm):
+    text = TextAreaField('', validators=[DataRequired()])
+
+    submit = SubmitField('Submit Review')
 

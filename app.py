@@ -5,12 +5,14 @@ from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # created libs
-from SQLfunctions import *
 from forms import *
+from SQLfunctions import *
+import datetime
 
-# Initiate Flask app
+
 app = Flask(__name__)
-app.secret_key = "abc"
+
+app.config['SECRET_KEY'] = 'bdb878ef8ea259ef877a3686726cf4f9'
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
@@ -19,10 +21,11 @@ app.config['MYSQL_DB'] = 'webshop'
 
 mysql = MySQL(app)
 
+
 #TODO: Kontroll om användaren redan finns i databasen.
 ## REGISTER PAGE ##
 @app.route("/register", methods=['GET', 'POST'])
-def register():  
+def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
@@ -34,7 +37,6 @@ def register():
     return render_template('register.html', form=form)
 
 
-## LOGIN PAGE ##
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -48,6 +50,7 @@ def login():
             if check_password_hash(str(data[0][4]), form.password.data):
                 session['userid'] = data[0][0]
                 session['username'] = data[0][1]
+
                 flash('You Are Now Logged In!', 'success')
                 return redirect('/')
             else:
@@ -56,12 +59,10 @@ def login():
             flash('Invalid Email Or Password', 'danger')
     return render_template('login.html', form=form)
 
-
 @app.route("/customerMypage")
 def customerMypage():
 
     return render_template('customerMypage.html')
-
 
 ## INDEX PAGE ##
 @app.route('/')
@@ -132,7 +133,7 @@ def cart():
         return redirect('/login')
     attr = 'cart.prodID, products.name, cart.qty'
     join = 'products ON cart.prodID = products.prodID'
-    cond = 'cart.custID = '+str(session['userid'])
+    cond = 'cart.custID ='+str(session['userid'])
     cart = innerJoin('cart', attr, join, cond)
     lenofcart = len(cart)
     return render_template('cart.html', cart = cart, lenofcart=lenofcart)
@@ -180,7 +181,6 @@ def startsess():
     session['userid'] = 1891
     session['username'] = 'admin'
     return redirect('/')
-
 
 ## ADMIN - CUSTOMER PAGES ##
 @app.route('/admin/customers')
@@ -253,8 +253,6 @@ def admin_products_edit():
         return redirect('/admin/product/edit?id='+str(res[0]))
 
     return render_template('admin/products.html', p=page, form=editform, item=res)
-    
-
 
 ## ADMIN - ORDER PAGES ##
 @app.route('/admin/orders')
