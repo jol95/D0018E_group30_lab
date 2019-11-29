@@ -10,12 +10,9 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- -----------------------------------------------------
 -- Schema webshop
 -- -----------------------------------------------------
-
--- -----------------------------------------------------
--- Schema webshop
--- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `webshop` DEFAULT CHARACTER SET utf8 ;
 USE `webshop` ;
+
 
 -- -----------------------------------------------------
 -- Table `webshop`.`products`
@@ -32,8 +29,6 @@ CREATE TABLE IF NOT EXISTS `webshop`.`products` (
   PRIMARY KEY (`prodID`))
 ENGINE = InnoDB
 AUTO_INCREMENT = 10000
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_swedish_ci;
 
 
 -- -----------------------------------------------------
@@ -53,8 +48,6 @@ CREATE TABLE IF NOT EXISTS `webshop`.`customers` (
   UNIQUE INDEX `email_UNIQUE` (`email` ASC))
 ENGINE = InnoDB
 AUTO_INCREMENT = 800000
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_swedish_ci;
 
 
 -- -----------------------------------------------------
@@ -112,7 +105,6 @@ CREATE TABLE IF NOT EXISTS `webshop`.`orders` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-
 -- -----------------------------------------------------
 -- Table `webshop`.`orderlines`
 -- -----------------------------------------------------
@@ -137,6 +129,31 @@ CREATE TABLE IF NOT EXISTS `webshop`.`orderlines` (
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
+-- Table `webshop`.`reviews`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `webshop`.`reviews` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `prodID` INT(11) NOT NULL,
+  `custID` INT(11) NOT NULL,
+  `text` TINYTEXT NOT NULL,
+  `date` VARCHAR(45) NOT NULL,
+  `rating` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `prodID_idx` (`prodID` ASC),
+  INDEX `fk_custID_idx` (`custID` ASC),
+  CONSTRAINT `fk_custID`
+    FOREIGN KEY (`custID`)
+    REFERENCES `webshop`.`customers` (`custID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_prodID`
+    FOREIGN KEY (`prodID`)
+    REFERENCES `webshop`.`products` (`prodID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+
+-- -----------------------------------------------------
 -- Populate product table
 -- -----------------------------------------------------
 INSERT INTO `products` (`name`, `desc`, `price`, `img`, `stock`) VALUES
@@ -147,7 +164,6 @@ INSERT INTO `products` (`name`, `desc`, `price`, `img`, `stock`) VALUES
     ('Svart stickad mössa', '', 100, '', 20),
     ('Lila stickad mössa', '', 100, '', 20),
     ('Transparant stickad mössa', '', 100, '', 20);
-
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

@@ -24,6 +24,11 @@ class LoginForm(FlaskForm):
 
     submit = SubmitField('Login')
 
+class ReviewForm(FlaskForm):
+    text = TextAreaField('', validators=[DataRequired()])
+
+    submit = SubmitField('Submit Review')
+
 class adminProdSearch(FlaskForm):
     search = StringField(validators=[DataRequired()])
     submit = SubmitField('search')

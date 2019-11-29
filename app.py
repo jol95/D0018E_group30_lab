@@ -72,11 +72,24 @@ def index():
 
 
 ## PRODUCT PAGE ##
-@app.route('/product')
+@app.route('/product', methods=['GET', 'POST'])
 def product():
+    form = ReviewForm()
     args = request.args
     item = getRow('products', 'prodID='+args.get("id"))
-    return render_template('productpage.html', item = item)
+    rev = getTable('reviews WHERE prodID=%s'%(item[0]))
+    ## SUBMITTING REVIEWS ##
+    if request.method=='POST':
+        prodID = item[0]
+        custID = str(session['userid'])
+        text = form.text.data
+        date = '12'
+        attr = 'prodID, custID, text, date'
+        val = '%s, %s, "%s", %s' %(prodID, custID, text, date)
+        insertTo('reviews', attr, val)
+        flash('Thank you for leaving a review!', 'success')
+        return redirect('/product?id=%s' %item[0])
+    return render_template('productpage.html', item = item, form=form, rev=rev)
 
 
 ## ADD TO CART FUNCTION ##
@@ -221,14 +234,23 @@ def admin_products_edit():
     # initalize edit form
     editform = adminProdEdit()
 
+    res = getRow('products', 'prodID ='+request.args.get('id'))
+
     # update the product
     if request.method == 'POST':
-        update = 'name="%s", desc="%s", price=%s, img="%s", stock=%s, category=%s, discount=%s' %(editform.name.data, editform.desc.data, editform.price.data, editform.img.data, editform.stock.data, editform.cat.data, editform.discount.data)
-        cond = 'prodID = %s' %(request.args.get('prodID'))
-        return updateAll('products', update, cond)
-    # default show the product
-    else:
-        res = getRow('products', 'prodID ='+request.args.get('id'))
+        name = str(editform.name.data)
+        desc = str(editform.desc.data) if str(editform.desc.data) != "" else str(res[2])
+        price = str(editform.price.data)
+        img = str(editform.img.data) if str(editform.img.data) != "" else str(res[4])
+        stock = str(editform.stock.data)
+        cat = str(editform.cat.data)
+        disc = str(editform.discount.data)
+        # update = 'name='+name+', desc='+desc+', price='+price+', img='+img+', stock='+stock+', category='+cat+', discount='+disc
+        update = 'a.name="%s", a.desc="%s", a.price=%s, a.img="%s", a.stock=%s, a.category="%s", a.discount=%s' %(name, desc, price, img, stock, cat, disc)
+        cond = 'prodID = %s' %(str(request.form.get('prodID')))
+        updateAll('products as a', update, cond)
+        flash('Update sucessfull!', 'success')
+        return redirect('/admin/product/edit?id='+str(res[0]))
 
     return render_template('admin/products.html', p=page, form=editform, item=res)
     
