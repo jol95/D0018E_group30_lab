@@ -26,8 +26,12 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
+        profile_pic = 'default.jpg'
         hashed_password = generate_password_hash(form.password.data)
-        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno) VALUE(%s,%s,%s,%s,%s,%s,%s, %s)',(form.first_name.data, form.last_name.data, form.email.data, hashed_password, form.home_address.data,form.post_code.data, form.country.data, form.phone_number.data))
+        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno)'
+                    ' VALUE(%s,%s,%s,%s,%s,%s,%s, %s, %s)',(form.first_name.data, form.last_name.data, form.email.data,
+                                                        hashed_password, form.home_address.data,form.post_code.data,
+                                                        form.country.data, form.phone_number.data, profile_pic))
         mysql.connection.commit()
         flash('You Have Created An Account!', 'success')
         return redirect('/')
