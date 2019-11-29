@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #-*- coding: -utf-8 -*-
 # installed libs
 from flask import *
@@ -6,12 +5,7 @@ from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # created libs
-=======
-from flask import *
-from flask_mysqldb import MySQL
-from forms import RegistrationForm, LoginForm, ReviewForm
-from werkzeug.security import generate_password_hash, check_password_hash
->>>>>>> osc
+from forms import *
 from SQLfunctions import *
 import datetime
 
@@ -27,11 +21,9 @@ app.config['MYSQL_DB'] = 'webshop'
 
 mysql = MySQL(app)
 
-<<<<<<< HEAD
+
 #TODO: Kontroll om användaren redan finns i databasen.
 ## REGISTER PAGE ##
-=======
->>>>>>> osc
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
@@ -57,10 +49,8 @@ def login():
         if len(data) > 0:
             if check_password_hash(str(data[0][4]), form.password.data):
                 session['userid'] = data[0][0]
-<<<<<<< HEAD
                 session['username'] = data[0][1]
-=======
->>>>>>> osc
+
                 flash('You Are Now Logged In!', 'success')
                 return redirect('/')
             else:
@@ -69,16 +59,11 @@ def login():
             flash('Invalid Email Or Password', 'danger')
     return render_template('login.html', form=form)
 
-<<<<<<< HEAD
-
 @app.route("/customerMypage")
 def customerMypage():
 
     return render_template('customerMypage.html')
 
-
-=======
->>>>>>> osc
 ## INDEX PAGE ##
 @app.route('/')
 def index():
@@ -104,7 +89,7 @@ def product():
         val = '%s, %s, "%s", %s' %(prodID, custID, text, date)
         insertTo('reviews', attr, val)
         flash('Thank you for leaving a review!', 'success')
-        return redirect('/')
+        return redirect('/product?id=%s' %item[0])
     return render_template('productpage.html', item = item, form=form, rev=rev)
 
 
@@ -148,11 +133,7 @@ def cart():
         return redirect('/login')
     attr = 'cart.prodID, products.name, cart.qty'
     join = 'products ON cart.prodID = products.prodID'
-<<<<<<< HEAD
     cond = 'cart.custID ='+str(session['userid'])
-=======
-    cond = 'cart.custID = '+str(session['userid'])
->>>>>>> cho
     cart = innerJoin('cart', attr, join, cond)
     lenofcart = len(cart)
     return render_template('cart.html', cart = cart, lenofcart=lenofcart)
@@ -200,11 +181,6 @@ def startsess():
     session['userid'] = 1891
     session['username'] = 'admin'
     return redirect('/')
-
-<<<<<<< HEAD
-if __name__ == '__main__':
-    app.run(debug=True)
-=======
 
 ## ADMIN - CUSTOMER PAGES ##
 @app.route('/admin/customers')
@@ -258,18 +234,25 @@ def admin_products_edit():
     # initalize edit form
     editform = adminProdEdit()
 
+    res = getRow('products', 'prodID ='+request.args.get('id'))
+
     # update the product
     if request.method == 'POST':
-        update = 'name="%s", desc="%s", price=%s, img="%s", stock=%s, category=%s, discount=%s' %(editform.name.data, editform.desc.data, editform.price.data, editform.img.data, editform.stock.data, editform.cat.data, editform.discount.data)
-        cond = 'prodID = %s' %(request.args.get('prodID'))
-        return updateAll('products', update, cond)
-    # default show the product
-    else:
-        res = getRow('products', 'prodID ='+request.args.get('id'))
+        name = str(editform.name.data)
+        desc = str(editform.desc.data) if str(editform.desc.data) != "" else str(res[2])
+        price = str(editform.price.data)
+        img = str(editform.img.data) if str(editform.img.data) != "" else str(res[4])
+        stock = str(editform.stock.data)
+        cat = str(editform.cat.data)
+        disc = str(editform.discount.data)
+        # update = 'name='+name+', desc='+desc+', price='+price+', img='+img+', stock='+stock+', category='+cat+', discount='+disc
+        update = 'a.name="%s", a.desc="%s", a.price=%s, a.img="%s", a.stock=%s, a.category="%s", a.discount=%s' %(name, desc, price, img, stock, cat, disc)
+        cond = 'prodID = %s' %(str(request.form.get('prodID')))
+        updateAll('products as a', update, cond)
+        flash('Update sucessfull!', 'success')
+        return redirect('/admin/product/edit?id='+str(res[0]))
 
     return render_template('admin/products.html', p=page, form=editform, item=res)
-    
-
 
 ## ADMIN - ORDER PAGES ##
 @app.route('/admin/orders')
@@ -283,4 +266,3 @@ def admin_orders():
 
 if __name__ == "__main__":
 	app.run(debug = True)
->>>>>>> cho
