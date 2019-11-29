@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 
 <head>
@@ -37,11 +37,7 @@
             <div class="navbar-nav">
               {% if 'userid' in session: %}
               <div class="dropdown">
-<<<<<<< HEAD
-                <button class="dropbtn">Welcome, {{ session['username'] }}!</button>
-=======
                 <button class="dropbtn" data-toggle="dropdown">Welcome, {{ session['username'] }}!</button>
->>>>>>> master
                 <div class="dropdown-content">
                   {% if session.userid == 1891: %}
                   {# ADMIN DROPDOWN#}
@@ -51,11 +47,7 @@
                   {% else:%}
                   <a href="/cart">Cart</a>
                   <a href="#">Orders</a>
-<<<<<<< HEAD
-                  <a href="/customerMypage">My page</a>
-=======
                   <a href="#">My page</a>
->>>>>>> master
                   {% endif %}
                   <a href="/logout">Logout</a>
                 </div>
@@ -73,7 +65,7 @@
         </div>
       </nav>
     </header>
-
+    
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-12">
@@ -98,11 +90,5 @@
         </div> -->
       </div>
     </main>
-<<<<<<< HEAD
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-=======
->>>>>>> master
 </body>
 </html>
