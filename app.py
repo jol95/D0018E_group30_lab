@@ -269,7 +269,8 @@ def customerMypage():
         return redirect('/login')
     else:
         cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM customers WHERE custID = %s', [session['userid']])
+        custID = str(session['userid'])
+        cur.execute('SELECT * FROM customers WHERE custID = %s', [custID])
         data = cur.fetchall()
         firstname = data[0][1]
         lastname = data[0][2]
@@ -278,7 +279,6 @@ def customerMypage():
         postcode = data[0][6]
         country = data[0][7]
         phone = data[0][8]
-	print session['userid']
         image_file = url_for('static', filename='resources/' + data[0][9])
 
     return render_template('customerMypage.html', firstname=firstname, lastname=lastname, email=email, address=address,
