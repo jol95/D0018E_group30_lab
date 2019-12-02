@@ -61,11 +61,6 @@ def login():
     return render_template('login.html', form=form)
 
 
-@app.route("/customerMypage")
-def customerMypage():
-
-    return render_template('customerMypage.html')
-
 
 ## INDEX PAGE ##
 @app.route('/')
