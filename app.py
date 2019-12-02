@@ -269,6 +269,7 @@ def admin_orders():
 
 @app.route("/customerMypage")
 def customerMypage():
+    form = customerMypageform()
     if 'userid' not in session:
         flash('Please log in or create an account.', 'danger')
         return redirect('/login')
@@ -287,8 +288,7 @@ def customerMypage():
         image_file = url_for('static', filename='resources/' + data[0][9])
 
     return render_template('customerMypage.html', firstname=firstname, lastname=lastname, email=email, address=address,
-                           postcode=postcode, country=country, phone=phone, image_file=image_file)
-
+                           postcode=postcode, country=country, phone=phone, image_file=image_file, form=form)
 
 if __name__ == "__main__":
 	app.run(debug = True)
