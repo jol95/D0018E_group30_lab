@@ -42,5 +42,3 @@ class adminProdEdit(FlaskForm):
     discount = DecimalField('Discount')
 
     submit = SubmitField('Update')
-
-

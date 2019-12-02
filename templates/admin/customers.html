@@ -1,5 +1,92 @@
 {% extends 'layout.html' %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin/products.css') }}">
+{% endblock %}
+
 {% block content %}
-Customer page
+{% if p == 'searchresult' or p == '' %}
+<div class="header">Admin: Customers/{{p}}</div>
+<div class="menu">
+    <form method="POST" action="{{ url_for('admin_customers')}}" class="menu">
+        <div>
+            {{form.search(class='searchbar', placeholder='Search by customer number, name or e-mail')}}
+        </div>
+        <div>
+            {{form.submit(class='btn btn-primary mb-2')}}
+        </div>
+    </form>
+    <div>
+        <ul class="menu-list">
+            <li><a href="{{ url_for('admin_customers') }}?page=showall" class="btn btn-primary mb-2">Show all customers</a></li>
+        </ul>
+    </div>
+</div>
+{% endif %}
+{% if p == 'searchresult' %}
+<div class="table">
+        <div class="titlerow">
+            <div class="col1">CUSTOMER NO.</div>
+            <div class="col2">NAME</div>
+            <div class="col3">E-MAIL</div>
+        </div>
+        {% for post in res: %}
+        <div class="{{loop.cycle('itemrows', 'itemrows altrows')}}">
+            <div class="col1">{{ post.0 }}</div>
+            <div class="col2">{{ post.1 }} {{ post.2 }}</div>
+            <div class="col3">{{ post.3 }}</div>
+            <div class="col3">
+                <a href="{{ url_for('admin_customers_edit') }}?custid={{ post.0 }}">Edit</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+{% elif p == 'customer edit' %}
+<div class="header">Admin: {{p}}</div>
+<div class="table">
+        <div class="titlerow">Customer#: {{ cust.0 }}</div>
+        <form method="POST" action="">
+            <div class="itemrows">
+                {{ form.first_name.label }}
+                {{ form.first_name(class='form-control mb-2 mr-sm-2',
+                placeholder=cust.1, value=cust.1) }}
+            </div>
+            <div class="itemrows">
+                {{ form.last_name.label }}
+                {{ form.last_name(class='form-control mb-2 mr-sm-2',
+                placeholder=cust.2, value=cust.2)}}
+            </div>
+            <div class="itemrows">
+                {{ form.email.label }}
+                {{ form.email(class='form-control mb-2 mr-sm-2',
+                placeholder=cust.3, value=cust.3)}}
+            </div>
+            <div class="itemrows">
+                {{ form.home_address.label }}
+                {{ form.home_address(class='form-control mb-2 mr-sm-2',
+                placeholder=cust.5, value=cust.5)}}
+            </div>
+            <div class="itemrows">
+                {{ form.post_code.label }}
+                {{ form.post_code(class='form-control mb-2 mr-sm-2',
+                placeholder=cust.6, value=cust.6)}}
+            </div>
+            <div class="itemrows">
+                {{ form.country.label }}
+                {{ form.country(class='form-control mb-2 mr-sm-2',
+                placeholder=cust.7, value=cust.7)}}
+            </div>
+            <div class="itemrows">
+                {{ form.phone_number.label }}
+                {{ form.phone_number(class='form-control mb-2 mr-sm-2',
+                placeholder=cust.8, value=cust.8)}}
+            </div>
+            <div class="itemrows">
+                {{form.submit(class='btn btn-primary mb-2', value='Update')}}
+            </div>
+        </form>
+    </div>
+{% endif %}
+
 {% endblock %}
