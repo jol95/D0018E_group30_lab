@@ -278,7 +278,7 @@ def customerMypage():
         postcode = data[0][6]
         country = data[0][7]
         phone = data[0][8]
-        image_file = url_for('static', filename='profile_pics/default.jpg')
+        image_file = url_for('static', filename='resources/' + data[0][9])
 
     return render_template('customerMypage.html', firstname=firstname, lastname=lastname, email=email, address=address,
                            postcode=postcode, country=country, phone=phone, image_file=image_file)
