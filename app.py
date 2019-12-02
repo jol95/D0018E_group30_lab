@@ -193,13 +193,77 @@ def startsess():
     return redirect('/')
 
 ## ADMIN - CUSTOMER PAGES ##
-@app.route('/admin/customers')
+@app.route('/admin/customers', methods=['GET', 'POST'])
 def admin_customers():
     # denies access to admin pages if not admin
     if 'userid' not in session or session['userid'] != 1891:
         flash('Permission denied!', 'danger')
         return redirect('/')
-    return render_template('admin/customers.html')
+
+    # define page
+    page = ''
+
+    # intiate seach form
+    custSearch = adminProdSearch() # same form as ProdSearc
+    res = ''    # empty search result
+
+    # seach by customer number, name or e-mail
+    if request.method=='POST':
+        searchWord = str(custSearch.search.data)
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT * FROM customers WHERE firstname LIKE "%'+searchWord+\
+            '%" OR lastname LIKE "%'+searchWord+'%" OR custID LIKE "%'+searchWord+'%" OR email LIKE "%'+searchWord+'%"')
+        res = cur.fetchall()
+        cur.close()
+        
+        # flash message if customer not found
+        if len(res):
+            page = 'searchresult'
+        else:
+            flash('Customer not found.', 'danger')
+
+    # show all customers
+    if request.args.get('page') == 'showall':
+        res = getTable('customers')
+        page = 'searchresult'
+
+    return render_template('admin/customers.html', form=custSearch, res=res, p=page)
+
+## ADMIN - EDIT CUSTOMERS ##
+@app.route('/admin/customer/edit', methods=['GET', 'POST'])
+def admin_customers_edit():
+    # denies access to admin pages if not admin
+    if 'userid' not in session or session['userid'] != 1891:
+        flash('Permission denied!', 'danger')
+        return redirect('/')
+
+    # define page
+    page = 'customer edit'
+
+    # initialize edit form (same as RegistrationForm)
+    editCust = RegistrationForm()
+
+    # get customer info
+    custInfo = getRow('customers', 'custID=%s' %(request.args.get('custid'))) 
+
+    # update the customer info
+    if request.method == 'POST':
+        fname = str(editCust.first_name.data)
+        lname = str(editCust.last_name.data)
+        email = str(editCust.email.data)
+        addr = str(editCust.home_address.data)
+        pcode = str(editCust.post_code.data)
+        country = str(editCust.country.data)
+        phone = str(editCust.phone_number.data)
+        update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.address="%s", a.postcode="%s", \
+            a.country="%s", a.phoneno="%s"' %(fname, lname, email, addr, pcode, country, phone)
+        # cond = 'custID = %s' %(str(request.form.get('custID')))
+        cond = 'custID = %s' %(str(request.args.get('custid')))
+        updateAll('customers as a', update, cond)
+        flash('Update sucessfull!', 'success')
+        return redirect('/admin/customer/edit?custid='+str(custInfo[0]))
+
+    return render_template('admin/customers.html', form=editCust, cust=custInfo, p=page)
 
 ## ADMIN - PRODUCT PAGES ##
 @app.route('/admin/products', methods=['GET', 'POST'])
@@ -219,7 +283,8 @@ def admin_products():
     if request.method=='POST':
         searchWord = str(form.search.data)
         cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM products WHERE name LIKE "%'+searchWord+'%" OR prodID LIKE "%'+searchWord+'%"')
+        cur.execute('SELECT * FROM products WHERE name LIKE "%'+searchWord+\
+            '%" OR prodID LIKE "%'+searchWord+'%"')
         res = cur.fetchall()
         cur.close()
     else:
@@ -256,7 +321,8 @@ def admin_products_edit():
         stock = str(editform.stock.data)
         cat = str(editform.cat.data)
         disc = str(editform.discount.data)
-        update = 'a.name="%s", a.desc="%s", a.price=%s, a.img="%s", a.stock=%s, a.category="%s", a.discount=%s' %(name, desc, price, img, stock, cat, disc)
+        update = 'a.name="%s", a.desc="%s", a.price=%s, a.img="%s", a.stock=%s, \
+            a.category="%s", a.discount=%s' %(name, desc, price, img, stock, cat, disc)
         cond = 'prodID = %s' %(str(request.form.get('prodID')))
         updateAll('products as a', update, cond)
         flash('Update sucessfull!', 'success')

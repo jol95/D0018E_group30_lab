@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="header">{{p}}</div>
+<div class="header">Admin: {{p}}</div>
 {% if p == 'products' %}
 {# PRODUCT LIST PAGE #}
 <div class="menu">
@@ -95,37 +95,37 @@
 {% elif p == 'add' %}
 {# PRODUCT ADD PAGE #}
 <div class="table">
-        <div class="titlerow">New product</div>
-        <form method="POST" action="">
-            <div class="itemrows">
-                {{form.name.label}}
-                {{form.name(class='form-control mb-2 mr-sm-2')}}
-            </div>
-            <div class="itemrows">
-                {{form.desc.label}}
-                {{form.desc(class='form-control mb-2 mr-sm-2')}}
-            </div>
-            <div class="itemrows">
-                {{form.price.label}}
-                {{form.price(class='form-control mb-2 mr-sm-2')}}
-            </div>
-            <div class="itemrows">
-                {{form.stock.label}}
-                {{form.stock(class='form-control mb-2 mr-sm-2')}}
-            </div>
-            <div class="itemrows">
-                {{form.cat.label}}
-                {{form.cat(class='form-control mb-2 mr-sm-2')}}
-            </div>
-            <div class="itemrows">
-                {{form.img.label}}:
-                {{ form.img(class='form-control mb-2 mr-sm-2') }}
-            </div>
-            <div class="itemrows">
-                {{form.submit(class='btn btn-primary mb-2', value="Add product")}}
-                <a href="{{ url_for('admin_products' )}}" class="btn btn-primary mb-2">Cancel</a>
-            </div>
-        </form>
-    </div>
+    <div class="titlerow">New product</div>
+    <form method="POST" action="">
+        <div class="itemrows">
+            {{form.name.label}}
+            {{form.name(class='form-control mb-2 mr-sm-2')}}
+        </div>
+        <div class="itemrows">
+            {{form.desc.label}}
+            {{form.desc(class='form-control mb-2 mr-sm-2')}}
+        </div>
+        <div class="itemrows">
+            {{form.price.label}}
+            {{form.price(class='form-control mb-2 mr-sm-2')}}
+        </div>
+        <div class="itemrows">
+            {{form.stock.label}}
+            {{form.stock(class='form-control mb-2 mr-sm-2')}}
+        </div>
+        <div class="itemrows">
+            {{form.cat.label}}
+            {{form.cat(class='form-control mb-2 mr-sm-2')}}
+        </div>
+        <div class="itemrows">
+            {{form.img.label}}:
+            {{ form.img(class='form-control mb-2 mr-sm-2') }}
+        </div>
+        <div class="itemrows">
+            {{form.submit(class='btn btn-primary mb-2', value="Add product")}}
+            <a href="{{ url_for('admin_products' )}}" class="btn btn-primary mb-2">Cancel</a>
+        </div>
+    </form>
+</div>
 {% endif %}
 {% endblock %}
