@@ -261,6 +261,29 @@ def admin_orders():
 
     return render_template('admin/orders.html')
 
+
+@app.route("/customerMypage")
+def customerMypage():
+    if 'userid' not in session:
+        flash('Please log in or create an account.', 'danger')
+        return redirect('/login')
+    else:
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT * FROM customers WHERE custID = %s', [session['userid']])
+        data = cur.fetchall()
+        firstname = data[0][1]
+        lastname = data[0][2]
+        email = data[0][3]
+        address = data[0][5]
+        postcode = data[0][6]
+        country = data[0][7]
+        phone = data[0][8]
+        image_file = url_for('static', filename='profile_pics/' + data[0][9])
+
+    return render_template('customerMypage.html', firstname=firstname, lastname=lastname, email=email, address=address,
+                           postcode=postcode, country=country, phone=phone, image_file=image_file)
+
+
 if __name__ == "__main__":
 	app.run(debug = True)
 
