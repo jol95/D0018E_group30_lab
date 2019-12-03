@@ -372,17 +372,17 @@ def customerMypage():
             i = upload_file(form.picture.data)
             profile_pic = srt(i)
 
-        fname = str(editCust.first_name.data)
-        lname = str(editCust.last_name.data)
-        email = str(editCust.email.data)
-        addr = str(editCust.home_address.data)
-        pcode = str(editCust.post_code.data)
-        country = str(editCust.country.data)
-        phone = str(editCust.phone_number.data)
+        fname = str(form.first_name.data)
+        lname = str(form.last_name.data)
+        email = str(form.email.data)
+        addr = str(form.home_address.data)
+        pcode = str(form.post_code.data)
+        country = str(form.country.data)
+        phone = str(form.phone_number.data)
         cur.execute(
         'UPDATE customers SET (firstname,lastname,email, password, address, postcode, country, phoneno, profilepic)'
         ' VALUE(%s,%s,%s,%s,%s,%s,%s, %s, %s) WHERE custID = %s', (fname, lname, email, addr, pcode, country, phone, profile_pic), [custID])
-                                                 
+
 
         flash('Your Account Info Has Been Updated!', 'success')
         return redirect(url_for('customerMypage'))
