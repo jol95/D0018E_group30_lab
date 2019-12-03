@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, IntegerField, SubmitField, BooleanField, TextAreaField, FileField, DecimalField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
+from flask_wtf.file import FileField, FileAllowed
 
 
 class RegistrationForm(FlaskForm):
@@ -48,6 +49,7 @@ class customerMypageform(FlaskForm):
     post_code = StringField('Post Code', validators=[DataRequired()])
     phone_number = StringField('Phone Number', validators=[DataRequired()])
     country = StringField('Country', validators=[DataRequired()])
+    picture = FileField('Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
 
     submit = SubmitField('Update')
 
