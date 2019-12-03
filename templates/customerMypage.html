@@ -9,29 +9,21 @@
         </div>
       </div>
         <form method="POST" action="" enctype="multipart/form-data">
-            
+            {{ form.hidden_tag() }}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Customer Account Info</legend>
-                
-                
-                <div class="itemrows">
-                {{ form.last_name.label }}
-                {{ form.last_name(class='form-control mb-2 mr-sm-2',
-                placeholder=data.2, value=data.2)}}
-                </div>
-                
                 <div class="form-group">
                     {{ form.first_name.label(class="form-control-label") }}
 
                     {% if form.first_name.errors %}
-                        {{ form.first_name(class="form-control", placeholder="data.1", value=data.1) }}
+                        {{ form.first_name(class="form-control form-control-lg is-invalid", placeholder=data.1, value=data.1) }}
                         <div class="invalid-feedback">
                             {% for error in form.first_name.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.first_name(class="form-control form-control-lg") }}
+                        {{ form.first_name(class="form-control form-control-lg", placeholder=data.1, value=data.1) }}
                     {% endif %}
                 </div>
                 <div class="form-group">
@@ -44,7 +36,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.last_name(class="form-control form-control-lg") }}
+                        {{ form.last_name(class="form-control form-control-lg", placeholder=data.2, value=data.2) }}
                     {% endif %}
                 </div>
                 <div class="form-group">
@@ -58,7 +50,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.email(class="form-control form-control-lg") }}
+                        {{ form.email(class="form-control form-control-lg", placeholder=data.3, value=data.3, readonly=true) }}
                     {% endif %}
                 </div>
                 <div class="form-group">
@@ -72,7 +64,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.home_address(class="form-control form-control-lg") }}
+                        {{ form.home_address(class="form-control form-control-lg", placeholder=data.5, value=data.5) }}
                     {% endif %}
                 </div>
                 <div class="form-group">
@@ -86,7 +78,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.post_code(class="form-control form-control-lg") }}
+                        {{ form.post_code(class="form-control form-control-lg", placeholder=data.6, value=data.6) }}
                     {% endif %}
                 </div>
                 <div class="form-group">
@@ -100,7 +92,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.country(class="form-control form-control-lg") }}
+                        {{ form.country(class="form-control form-control-lg", placeholder=data.7, value=data.7) }}
                     {% endif %}
                 </div>
                 <div class="form-group">
@@ -114,7 +106,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.phone_number(class="form-control form-control-lg") }}
+                        {{ form.phone_number(class="form-control form-control-lg", placeholder=data.8, value=data.8) }}
                     {% endif %}
                 </div>
                 <div class="form-group">
