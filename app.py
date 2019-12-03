@@ -29,10 +29,10 @@ def register():
         email = form.email.data
         cur.execute('SELECT * FROM customers WHERE email = %s', [email])
         data = cur.fetchall()
-        
+
         if len(data) > 0:
             flash('Email Already exist!', 'danger')
-            
+
         else:
             cur = mysql.connection.cursor()
             profile_pic = 'default.jpg'
@@ -77,6 +77,7 @@ def login():
 def index():
     # Fetch all rows from product-table
     prod = getTable('products')
+    print prod
     return render_template('index.html', prod = prod)
 
 
@@ -192,13 +193,78 @@ def startsess():
 
 
 ## ADMIN - CUSTOMER PAGES ##
-@app.route('/admin/customers')
+@app.route('/admin/customers', methods=['GET', 'POST'])
 def admin_customers():
     # denies access to admin pages if not admin
     if 'userid' not in session or session['userid'] != 1891:
         flash('Permission denied!', 'danger')
         return redirect('/')
-    return render_template('admin/customers.html')
+
+    # define page
+    page = ''
+
+    # intiate seach form
+    custSearch = adminProdSearch()  # same form as ProdSearc
+    res = ''  # empty search result
+
+    # seach by customer number, name or e-mail
+    if request.method == 'POST':
+        searchWord = str(custSearch.search.data)
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT * FROM customers WHERE firstname LIKE "%' + searchWord + \
+                    '%" OR lastname LIKE "%' + searchWord + '%" OR custID LIKE "%' + searchWord + '%" OR email LIKE "%' + searchWord + '%"')
+        res = cur.fetchall()
+        cur.close()
+
+        # flash message if customer not found
+        if len(res):
+            page = 'searchresult'
+        else:
+            flash('Customer not found.', 'danger')
+
+    # show all customers
+    if request.args.get('page') == 'showall':
+        res = getTable('customers')
+        page = 'searchresult'
+
+    return render_template('admin/customers.html', form=custSearch, res=res, p=page)
+
+
+## ADMIN - EDIT CUSTOMERS ##
+@app.route('/admin/customer/edit', methods=['GET', 'POST'])
+def admin_customers_edit():
+    # denies access to admin pages if not admin
+    if 'userid' not in session or session['userid'] != 1891:
+        flash('Permission denied!', 'danger')
+        return redirect('/')
+
+    # define page
+    page = 'customer edit'
+
+    # initialize edit form (same as RegistrationForm)
+    editCust = RegistrationForm()
+
+    # get customer info
+    custInfo = getRow('customers', 'custID=%s' %(request.args.get('custid')))
+
+    # update the customer info
+    if request.method == 'POST':
+        fname = str(editCust.first_name.data)
+        lname = str(editCust.last_name.data)
+        email = str(editCust.email.data)
+        addr = str(editCust.home_address.data)
+        pcode = str(editCust.post_code.data)
+        country = str(editCust.country.data)
+        phone = str(editCust.phone_number.data)
+        update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.address="%s", a.postcode="%s", \
+            a.country="%s", a.phoneno="%s"' %(fname, lname, email, addr, pcode, country, phone)
+        # cond = 'custID = %s' %(str(request.form.get('custID')))
+        cond = 'custID = %s' %(str(request.args.get('custid')))
+        updateAll('customers as a', update, cond)
+        flash('Update sucessfull!', 'success')
+        return redirect('/admin/customer/edit?custid='+str(custInfo[0]))
+
+    return render_template('admin/customers.html', form=editCust, cust=custInfo, p=page)
 
 ## ADMIN - PRODUCT PAGES ##
 @app.route('/admin/products', methods=['GET', 'POST'])
@@ -214,7 +280,7 @@ def admin_products():
     # initialize searchbar
     form = adminProdSearch()
 
-    # seach by item number or product name
+    # search by item number or product name
     if request.method=='POST':
         searchWord = str(form.search.data)
         cur = mysql.connection.cursor()
@@ -267,28 +333,37 @@ def admin_orders():
     return render_template('admin/orders.html')
 
 
-@app.route("/customerMypage")
+@app.route("/customerMypage", methods=['GET', 'POST'])
 def customerMypage():
     form = customerMypageform()
     if 'userid' not in session:
         flash('Please log in or create an account.', 'danger')
-        return redirect('/login')
-    else:
-        cur = mysql.connection.cursor()
-        custID = str(session['userid'])
-        cur.execute('SELECT * FROM customers WHERE custID = %s', [custID])
-        data = cur.fetchall()
-        firstname = data[0][1]
-        lastname = data[0][2]
-        email = data[0][3]
-        address = data[0][5]
-        postcode = data[0][6]
-        country = data[0][7]
-        phone = data[0][8]
-        image_file = url_for('static', filename='resources/' + data[0][9])
+        return redirect(url_for('login'))
 
-    return render_template('customerMypage.html', firstname=firstname, lastname=lastname, email=email, address=address,
-                           postcode=postcode, country=country, phone=phone, image_file=image_file, form=form)
+    cur = mysql.connection.cursor()
+    custID = str(session['userid'])
+    cur.execute('SELECT * FROM customers WHERE custID = %s', [custID])
+    data = cur.fetchone()
+    image_file = url_for('static', filename='resources/' + data[9])
+
+    if form.validate_on_submit():
+        profile_pic = 'default.jpg'
+        fname = str(form.first_name.data)
+        lname = str(form.last_name.data)
+        email = str(form.email.data)
+        addr = str(form.home_address.data)
+        pcode = str(form.post_code.data)
+        country = str(form.country.data)
+        phone = str(form.phone_number.data)
+        update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.address="%s", a.postcode="%s", \
+                    a.country="%s", a.phoneno="%s", a.profilepic=%s' % (fname, lname, email, addr, pcode, country, phone, profile_pic)
+        cond = 'custID = %s' % (str(request.args.get('custid')))
+        updateAll('customers as a', update, cond)
+
+        flash('Your Account Info Has Been Updated!', 'success')
+        return redirect(url_for('customerMypage'))
+
+    return render_template('customerMypage.html', image_file=image_file, form=form, data=data)
 
 if __name__ == "__main__":
 	app.run(debug = True)
