@@ -370,21 +370,19 @@ def customerMypage():
     if form.validate_on_submit():
         if form.picture.data:
             i = upload_file(form.picture.data)
-            
+            profile_pic = srt(i)
 
-        fname = str(form.first_name.data)
-        lname = str(form.last_name.data)
-        email = str(form.email.data)
-        password = str(data[4])
-        addr = str(form.home_address.data)
-        pcode = str(form.post_code.data)
-        country = str(form.country.data)
-        phone = str(form.phone_number.data)
-        profile_pic = str(form.picture.data)
-        update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.password="%s", a.address="%s", a.postcode="%s", \
-                    a.country="%s", a.phoneno="%s", a.profilepic=%s' % (fname, lname, email, password, addr, pcode, country, phone, profile_pic)
-        cond = 'custID = %s' % (str(request.args.get('custid')))
-        updateAll('customers as a', update, cond)
+        fname = str(editCust.first_name.data)
+        lname = str(editCust.last_name.data)
+        email = str(editCust.email.data)
+        addr = str(editCust.home_address.data)
+        pcode = str(editCust.post_code.data)
+        country = str(editCust.country.data)
+        phone = str(editCust.phone_number.data)
+        cur.execute(
+        'UPDATE customers SET (firstname,lastname,email, password, address, postcode, country, phoneno, profilepic)'
+        ' VALUE(%s,%s,%s,%s,%s,%s,%s, %s, %s) WHERE custID = %s', (fname, lname, email, addr, pcode, country, phone, profile_pic), [custID])
+                                                 
 
         flash('Your Account Info Has Been Updated!', 'success')
         return redirect(url_for('customerMypage'))
