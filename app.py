@@ -3,7 +3,8 @@
 from flask import *
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
-import os, secrets
+import os
+import secrets
 from PIL import Image
 
 # created libs
@@ -343,13 +344,13 @@ def upload_file(pic_filename):
     _, f_ext = os.path.splittext(pic_filename.filename)
     picture_fn = hex_rand + f_ext
     picture_path = os.path.join(app.config['UPLOAD_FOLDER'], picture_fn)
-    
+
     standard_size = (125, 125)
     pic = Image.open(pic_filename)
     pic.thumbnail(standard_size)
     pic.save(picture_path)
     return picture_fn
-    
+
 
 
 @app.route("/customerMypage", methods=['GET', 'POST'])
@@ -368,10 +369,10 @@ def customerMypage():
     if form.validate_on_submit():
         if form.picture.data:
             profile_pic = upload_file(form.picture.data)
-            
+
         else:
             profile_pic = data[9]
-        
+
         fname = str(form.first_name.data)
         lname = str(form.last_name.data)
         email = str(form.email.data)
