@@ -68,11 +68,16 @@ def customerMypage():
     return render_template('customerMypage.html')
 
 ## INDEX PAGE ##
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    # Fetch all rows from product-table
-    prod = getTable('products')
-    return render_template('index.html', prod = prod)
+    # show search result
+    if request.method=='POST' and len(request.form.get('searchword')) :
+        # do some work
+        return 'search results'
+    else:
+        # Fetch all rows from product-table
+        res = getTable('products')
+    return render_template('index.html', prod = res)
 
 
 ## PRODUCT PAGE ##
