@@ -29,7 +29,7 @@
 }
 
 .altrows {
-    background-color: #d8d8d8;
+    background-color: #dadada;
 }
 
 .itemrows > div {
@@ -50,6 +50,11 @@
 .col3 {
     float: left;
     width: 170px;
+}
+
+.col5 {
+    float: left;
+    width: 100%;
 }
 
 input.col3 {

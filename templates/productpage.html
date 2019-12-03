@@ -2,6 +2,9 @@
 
 {% block stylesheets %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/prodpage.css') }}">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -24,17 +27,16 @@
 </div>
 
 {# VISA REVIEWS FÖR PRODUKTEN #}
-<div class ="grid-container">
-    {% for data in rev: %}
-        <div class="listreview">
-            User: {{ data.0 }}
+<div class="container mt-3">
+    <h5>Product review</h5>
+    {% for data in rev %}
+    <div class="media border p-3">
+        <img src="{{url_for('static', filename='resources/img_avatar3.png')}}" alt="John Doe" class="mr-3 mt-3 rounded-circle" style="width:60px;">
+        <div class="media-body">
+        <h4>{{data.0}} <small><i>Posted on {{data.1}}</i></small></h4>
+        <p>{{data.2}}</p>      
         </div>
-        <div class="listreview">
-            Date: {{ data.1 }}
-        </div>
-        <div class="listreview">
-            Comment: {{ data.2 }}
-        </div>
+    </div>
     {% endfor %}
 </div>
 

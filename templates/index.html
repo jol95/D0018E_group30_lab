@@ -5,22 +5,22 @@
     {% endblock %}
 
 {% block content %}
-<div class="prodgrid">
+<div class="container-fluid">
     {% for items in prod %}
-    <a href="/product?id={{items.0}}" titel="{{ items.1 }}">
-    <div class="item">
-        <div class="img">
-            {% if items.4 == '' %}
-            <img src="{{ url_for('static', filename='resources/noimg.jpg') }}" alt="noimg" class="img-rounded" width="150" height="150"/>
+    <div class="col">
+        <div class="card" style="width:250px; height: 450px; float: left; margin: 5px;">
+            {% if items.4 %}
+            <img class="card-img-top" src="{{ url_for('static', filename='resources/') }}{{ items.4 }}" alt="{{ items.4 }}" style="width:100%">
             {% else %}
-            <img src="{{ url_for('static', filename='resources/') }}{{ items.4 }}" alt="{{items.4}}" class="img-rounded" width="150" height="150"/>
+            <img class="card-img-top" src="{{ url_for('static', filename='resources/noimg.jpg')}}" alt="" style="width:100%">
             {% endif %}
+            <div class="card-body">
+                <h4 class="card-title"><a href="{{url_for('product')}}?id={{items.0}}">{{ items.1 }}</a></h4>
+                <p class="card-text">{{ items.3 }} SEK</p>
+                <a href="{{ url_for('addtocart')}}?id={{items.0}}&qty=1" class="btn btn-primary">Buy</a>
+            </div>
         </div>
-        <div class="name">{{items.1}}</div>
-        <div class="desc">{{items.2}}</div>
-        <div class="price">{{items.3}} SEK</div>
     </div>
-    </a>
     {% endfor %}
 </div>
 {% endblock content %}
