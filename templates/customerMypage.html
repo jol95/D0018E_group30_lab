@@ -12,6 +12,14 @@
             
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Customer Account Info</legend>
+                
+                
+                <div class="itemrows">
+                {{ form.last_name.label }}
+                {{ form.last_name(class='form-control mb-2 mr-sm-2',
+                placeholder=data.2, value=data.2)}}
+                </div>
+                
                 <div class="form-group">
                     {{ form.first_name.label(class="form-control-label") }}
 
