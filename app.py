@@ -370,16 +370,17 @@ def customerMypage():
     if form.validate_on_submit():
         if form.picture.data:
             i = upload_file(form.picture.data)
-            profile_pic = str(i)
+            
 
         fname = str(form.first_name.data)
         lname = str(form.last_name.data)
         email = str(form.email.data)
-        password = data[4]
+        password = str(data[4])
         addr = str(form.home_address.data)
         pcode = str(form.post_code.data)
         country = str(form.country.data)
         phone = str(form.phone_number.data)
+        profile_pic = str(form.picture.data)
         update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.password="%s", a.address="%s", a.postcode="%s", \
                     a.country="%s", a.phoneno="%s", a.profilepic=%s' % (fname, lname, email, password, addr, pcode, country, phone, profile_pic)
         cond = 'custID = %s' % (str(request.args.get('custid')))
