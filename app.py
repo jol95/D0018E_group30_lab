@@ -3,6 +3,8 @@
 from flask import *
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
+import os, secrets
+from PIL import Image
 
 # created libs
 from SQLfunctions import *
@@ -16,6 +18,9 @@ app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'Choss!95'
 app.config['MYSQL_DB'] = 'webshop'
+
+UPLOAD_FOLDER = '/static/resources'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 mysql = MySQL(app)
 
@@ -333,6 +338,20 @@ def admin_orders():
     return render_template('admin/orders.html')
 
 
+def upload_file(pic_filename):
+    hex_rand = secrets.token_hex(8)
+    _, f_ext = os.path.splittext(pic_filename.filename)
+    picture_fn = hex_rand + f_ext
+    picture_path = os.path.join(app.config['UPLOAD_FOLDER'], picture_fn)
+    
+    standard_size = (125, 125)
+    pic = Image.open(pic_filename)
+    pic.thumbnail(standard_size)
+    pic.save(picture_path)
+    return picture_fn
+    
+
+
 @app.route("/customerMypage", methods=['GET', 'POST'])
 def customerMypage():
     form = customerMypageform()
@@ -344,10 +363,15 @@ def customerMypage():
     custID = str(session['userid'])
     cur.execute('SELECT * FROM customers WHERE custID = %s', [custID])
     data = cur.fetchone()
-    image_file = url_for('static', filename='resources/' + data[9])
+    profile_pic = data[9]
 
     if form.validate_on_submit():
-        profile_pic = 'default.jpg'
+        if form.picture.data:
+            profile_pic = upload_file(form.picture.data)
+            
+        else:
+            profile_pic = data[9]
+        
         fname = str(form.first_name.data)
         lname = str(form.last_name.data)
         email = str(form.email.data)
@@ -362,6 +386,8 @@ def customerMypage():
 
         flash('Your Account Info Has Been Updated!', 'success')
         return redirect(url_for('customerMypage'))
+
+    image_file = url_for('static', filename='resources/' + profile_pic)
 
     return render_template('customerMypage.html', image_file=image_file, form=form, data=data)
 
