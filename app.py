@@ -4,8 +4,8 @@ from flask import *
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
-import secrets
 from PIL import Image
+from werkzeug.utils import secure_filename
 
 # created libs
 from SQLfunctions import *
@@ -340,9 +340,10 @@ def admin_orders():
 
 
 def upload_file(pic_filename):
-    hex_rand = secrets.token_hex(8)
-    _, f_ext = os.path.splittext(pic_filename.filename)
-    picture_fn = hex_rand + f_ext
+    #hex_rand = secrets.token_hex(8)
+    picture_fn = secure_filename(pic_filename.filename)
+    #_, f_ext = os.path.splittext(pic_filename.filename)
+    #picture_fn =  + f_ext
     picture_path = os.path.join(app.config['UPLOAD_FOLDER'], picture_fn)
 
     standard_size = (125, 125)
