@@ -5,12 +5,13 @@
 {% endblock%}
 
 {% block content %}
-<div class="header">Shopping cart</div>
+<div class="header">My shopping cart</div>
 <div class="cartcontainer">
     <div class="titlerow">
         <div class="col1">ITEM NUMBER</div>
         <div class="col2">NAME</div>
-        <div class="col3">QUANTITY</div>
+        <div class="col3">UNIT PRICE (SEK)</div>
+        <div class="col3">QUANTITY (PCS)</div>
     </div>
     {% if lenofcart <= 0:%}
         <p>The shopping cart is empty.</p>
@@ -19,26 +20,33 @@
     <div class="{{loop.cycle('itemrows', 'itemrows altrows')}}">
         <div class="col1">{{items.0}}</div>
         <div class="col2">{{items.1}}</div>
+        <div class="col3">{{items.2}}</div>
         <div class="col3">
-            <form action="{{ url_for('updatecart') }}">
-                <input name="qty" value="{{items.2}}" class="col3" type="text">
+            <form action="{{ url_for('updatecart') }}?action=update" method="POST">
+                <input name="qty" value="{{items.3}}" class="col3" type="text">
                 <input name="id" value="{{items.0}}" class="hidden" type="text">
                 &nbsp;
-                <input type="submit" value="Update">
+                <input type="submit" value="Update" class="btn btn-secondary btn-sm">
             </form>
         </div>
+        <div class="col3"><a href="{{ url_for('updatecart') }}?action=delete&id={{ items.0 }}" class="btn btn-danger btn-sm" title="delete">X</a></div>
     </div>
     {% endfor %}
 </div>
 <div class="footer">
-    <div>Checkout</div>
+    {# Prompt confim before clearing #}
+    {% if request.args.get('confirm') == 'clearcart': %}
     <div>
-        {# Prompt confim before clearing #}
-        {% if request.args.get('confirm'): %}
-        Are you sure? <a href="/clearcart">Yes</a> / <a href="/cart">No</a>
-        {% else: %}
-        <a href="/confirmclear">Clear</a>
-        {% endif %}
+        Are you sure you want to clear the cart? <a href="{{ url_for('updatecart') }}?action=clear" class='btn btn-success mb-2'>Yes</a> / <a href="/cart" class='btn btn-danger mb-2'>No</a>
     </div>
+    {% elif request.args.get('confirm') == 'checkout': %}
+    <div>
+        Do you want to confirm the order? <a href="{{ url_for('checkout') }}" class='btn btn-success mb-2'>Yes</a> / <a href="/cart" class='btn btn-danger mb-2'>No</a>
+    </div>
+    {% else: %}
+    <div><a href="{{ url_for('cart')}}?confirm=checkout" class='btn btn-primary mb-2'>Checkout</a></div>
+    <div><a href="{{ url_for('cart')}}?confirm=clearcart" class='btn btn-primary mb-2'>Clear</a></div>
+    <div>Total amount: {{totalamount}} SEK</div>
+    {% endif %}
 </div>
 {% endblock %}

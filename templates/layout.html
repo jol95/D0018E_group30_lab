@@ -41,24 +41,24 @@
                 <div class="dropdown-content">
                   {% if session.userid == 1891: %}
                   {# ADMIN DROPDOWN#}
-                  <a href="/admin/orders">Orders</a>
-                  <a href="/admin/products">Products</a>
-                  <a href="/admin/customers">Customers</a>
+                  <a href="{{ url_for('admin_orders') }}">Orders</a>
+                  <a href="{{ url_for('admin_products') }}">Products</a>
+                  <a href="{{ url_for('admin_customers') }}">Customers</a>
                   {% else:%}
-                  <a href="/cart">Cart</a>
-                  <a href="#">Orders</a>
+                  <a href="{{ url_for('cart') }}">Cart</a>
+                  <a href="{{ url_for('orders') }}">Orders</a>
                   <a href="#">My page</a>
                   {% endif %}
-                  <a href="/logout">Logout</a>
+                  <a href="{{ url_for('logout') }}">Logout</a>
                 </div>
               </div>
               {# note: this is out-commented
-              <a class="nav-item nav-link" href="/cart">Cart</a>
+              <a class="nav-item nav-link" href="{{ url_for('cart') }}">Cart</a>
               <a class="nav-item nav-link" href="{{ url_for('logout')}}">Logout</a>
               #}
               {% else: %}
               <a class="nav-item nav-link" href="{{ url_for('login')}}">Login</a>
-              <a class="nav-item nav-link" href="/register">Register</a>
+              <a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>
               {% endif %}
             </div>
           </div>

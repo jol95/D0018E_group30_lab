@@ -22,7 +22,6 @@ app.config['MYSQL_DB'] = 'webshop'
 mysql = MySQL(app)
 
 
-#TODO: Kontroll om användaren redan finns i databasen.
 ## REGISTER PAGE ##
 @app.route("/register", methods=['GET', 'POST'])
 def register():  
@@ -102,7 +101,6 @@ def product():
         return redirect('/product?id=%s' %item[0])
     return render_template('productpage.html', item = item, form=form, rev=rev)
 
-
 ## ADD TO CART FUNCTION ##
 @app.route('/addtocart')
 def addtocart():
@@ -130,10 +128,8 @@ def addtocart():
         insertTo('cart', attr, values)
 
     flash('Product has been added to the shopping cart.', 'success')
-    return redirect('/product?id='+prodID)
+    return redirect(url_for('cart'))
 
-
-#TODO: Bekräfta order funktion
 ## CART PAGE ##
 @app.route('/cart')
 def cart():
@@ -141,43 +137,124 @@ def cart():
     if 'userid' not in session:
         flash('Please log in or create an account.', 'danger')
         return redirect('/login')
-    attr = 'cart.prodID, products.name, cart.qty'
+
+    # getting cart
+    attr = 'cart.prodID, products.name, products.price, cart.qty'
     join = 'products ON cart.prodID = products.prodID'
     cond = 'cart.custID ='+str(session['userid'])
     cart = innerJoin('cart', attr, join, cond)
     lenofcart = len(cart)
-    return render_template('cart.html', cart = cart, lenofcart=lenofcart)
+
+    # calculate the total amount of the cart
+    totalamount = 0
+    for items in cart:
+        totalamount += int(items[2])*int(items[3])
+    
+    return render_template('cart.html', cart = cart, lenofcart=lenofcart,\
+        totalamount=totalamount)
 
 ## UPDATE CART FUNCTION ##
-@app.route('/updatecart')
+@app.route('/updatecart', methods=['GET', 'POST'])
 def updatecart():
     # redirect user to login page if not logged in
     if 'userid' not in session:
         flash('Please log in or create an account.', 'danger')
         return redirect('/login')
 
-    custID = str(session['userid'])  # temporary customer ID (unregistred user)
-    prodID = str(request.args.get('id')) # productID
-    qty = str(request.args.get('qty'))   # quantity
-    cond = 'custID = '+custID+' AND prodID = '+prodID   # insert/update condition
-    updateIn('cart', 'qty', qty, cond)
-    flash('The cart has been updated.', 'success')
+    # update post in the cart
+    if request.args.get('action') == 'update':
+        cond = 'custID=%s and prodID=%s' %(str(session['userid']),\
+            request.form.get('id'))
+        if int(request.form.get('qty')) == 0:
+            deleteFrom('cart', cond)
+            flash('Item %s has been removed from the cart.' \
+                %(str(request.form.get('id'))), 'danger')
+        else:
+            updateIn('cart', 'qty', str(request.form.get('qty')),cond)
+            flash('The cart has been updated.', 'success')
+    
+    # delete post in the cart
+    if request.args.get('action') == 'delete':
+        cond = 'custID=%s and prodID=%s' %(str(session['userid']),\
+            str(request.args.get('id')))
+        deleteFrom('cart', cond)
+        flash('Item %s has been removed from the cart.' %(str(request.args.get('id'))), 'danger')
+
+    # clear cart
+    if request.args.get('action') == 'clear':
+        deleteFrom('cart', 'custID='+str(session['userid']))
+        flash('Your cart has been cleared.', 'danger')
+
     return redirect('/cart')
 
-## CLEAR CART FUNCTION ##
-@app.route('/clearcart')
-def clearcart():
+## CHECKOUT PAGE ##
+@app.route('/checkout')
+def checkout():
     # redirect user to login page if not logged in
     if 'userid' not in session:
         flash('Please log in or create an account.', 'danger')
         return redirect('/login')
-    deleteFrom('cart', 'custID='+str(session['userid']))
-    return redirect('/cart')
 
-@app.route('/confirmclear')
-def confirmclear():
-    return redirect('/cart?confirm=True')
+    # get shopping cart
+    attr = 'cart.prodID, products.name, products.price, products.discount, cart.qty'
+    join = 'products ON cart.prodID = products.prodID'
+    cond = 'cart.custID ='+str(session['userid'])
+    cart = innerJoin('cart', attr, join, cond)
 
+    if len(cart) <= 0:
+        flash('Nothing to checkout.', 'danger')
+        return redirect(url_for('cart'))
+    else:
+        # create order
+        insertTo('orders', 'custID, status, amount', '{}, 0, 0'.format(session['userid']))
+        orderno = getOne('orders', 'orderID',
+        'custID={} ORDER BY orderID DESC'.format(session['userid']))
+
+        # move cart to orderlines
+        lineno = 1  # initiate linenumber for each order
+        cartamount = 0 # order amount
+        for post in cart:
+            insertTo('orderln', 'orderID, lineno, prodID, qty, price, discount',
+            '{}, {}, {}, {}, {}, {}'.format(orderno[0], lineno, post[0],
+            str(post[4]), str(post[2]), str(post[3])))
+            lineno+=1   # increase line number
+            cartamount += post[2]*(100-post[3])/100*post[4] # total amount
+        
+        # insert cart amount to order amount
+        updateAll('orders', 'amount={}'.format(str(cartamount)), 'orderID={}'.format(orderno[0]))
+        
+        # delete cart once moved to order
+        deleteFrom('cart', 'custID='+str(session['userid']))
+        
+        # flash message to customer
+        flash('Thank you for placing your order!', 'success')
+
+    return redirect(url_for('index'))
+
+## ORDER PAGE ##
+@app.route('/orders')
+def orders():
+    # redirect user to login page if not logged in
+    if 'userid' not in session:
+        flash('Please log in or create an account.', 'danger')
+        return redirect('/login')
+    
+    # getting customers orders information
+    attr = 'o.orderID, o.date, o.amount, t.text'
+    join = 'text as t ON o.status = t.textid'
+    cond = 'o.custID={} AND t.typeid=2 ORDER BY o.orderID ASC'.format(session['userid'])
+    orders = innerJoin('orders as o', attr, join, cond)
+    orderrows = ''
+    totalamount = getSum(table='orders', column='amount',
+    condition='custID={}'.format(session['userid']))
+    # return str(totalamount('decimal'))
+
+    # getting order rows
+    if request.args.get('order'):
+        orderrows = getTable('orderln WHERE orderID={}'.format(request.args.get('order')))
+
+    return render_template('orders.html', orders=orders, rows=orderrows,
+    totalamount=totalamount)
 
 # länk för att cleara session
 @app.route('/logout')
@@ -210,11 +287,9 @@ def admin_customers():
     # seach by customer number, name or e-mail
     if request.method=='POST':
         searchWord = str(custSearch.search.data)
-        cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM customers WHERE firstname LIKE "%'+searchWord+\
-            '%" OR lastname LIKE "%'+searchWord+'%" OR custID LIKE "%'+searchWord+'%" OR email LIKE "%'+searchWord+'%"')
-        res = cur.fetchall()
-        cur.close()
+        res = getTable('customers WHERE firstname LIKE "%'+searchWord+\
+            '%" OR lastname LIKE "%'+searchWord+'%" OR custID LIKE "%'+searchWord+\
+                '%" OR email LIKE "%'+searchWord+'%"')
         
         # flash message if customer not found
         if len(res):
@@ -345,7 +420,7 @@ def admin_products_add():
 
     # add the product
     if request.method == 'POST':
-        # from data
+        # form data
         name = str(addform.name.data)
         desc = addform.desc.data
         price = str(addform.price.data) if str(addform.price.data) != "" else '0'
@@ -388,4 +463,5 @@ def admin_orders():
     return render_template('admin/orders.html')
 
 if __name__ == "__main__":
-	app.run(debug = True)
+    app.debug=True
+    app.run(host='0.0.0.0', port=5000)
