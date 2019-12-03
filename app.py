@@ -341,10 +341,10 @@ def admin_orders():
 
 def upload_file(pic_filename):
     #hex_rand = secrets.token_hex(8)
-    picture_fn = secure_filename(pic_filename.filename)
+    #picture_fn = secure_filename(pic_filename.filename)
     #_, f_ext = os.path.splittext(pic_filename.filename)
     #picture_fn =  + f_ext
-    picture_path = os.path.join(app.config['UPLOAD_FOLDER'], picture_fn)
+    picture_path = os.path.join(app.config['UPLOAD_FOLDER'], pic_filename)
 
     standard_size = (125, 125)
     pic = Image.open(pic_filename)
@@ -369,7 +369,8 @@ def customerMypage():
 
     if form.validate_on_submit():
         if form.picture.data:
-            profile_pic = upload_file(form.picture.data)
+            i = upload_file(form.picture.data)
+            profile_pic = str(i)
 
         else:
             profile_pic = data[9]
