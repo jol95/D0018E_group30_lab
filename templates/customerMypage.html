@@ -14,10 +14,9 @@
                 <legend class="border-bottom mb-4">Customer Account Info</legend>
                 <div class="form-group">
                     {{ form.first_name.label(class="form-control-label") }}
-                        {{ data.1 }}
 
                     {% if form.first_name.errors %}
-                        {{ form.first_name(class="form-control form-control-lg is-invalid", placeholder=data.1, value=data.1) }}
+                        {{ form.first_name(class="form-control form-control-lg is-invalid", placeholder="data.1", value=data.1) }}
                         <div class="invalid-feedback">
                             {% for error in form.first_name.errors %}
                                 <span>{{ error }}</span>
