@@ -344,7 +344,7 @@ def upload_file(pic_filename):
     #picture_fn = secure_filename(pic_filename.filename)
     #_, f_ext = os.path.splittext(pic_filename.filename)
     #picture_fn =  + f_ext
-    picture_path = os.path.join(app.route_path, 'static/resources', pic_filename)
+    picture_path = os.path.join(app.route_path, app.config['UPLOAD_FOLDER'], pic_filename)
 
     standard_size = (125, 125)
     pic = Image.open(pic_filename)
