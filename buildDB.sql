@@ -165,6 +165,7 @@ CREATE TABLE IF NOT EXISTS `webshop`.`reviews` (
   `custID` INT(11) NOT NULL,
   `text` LONGTEXT NOT NULL,
   `date` VARCHAR(45) NOT NULL,
+  `stars` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `prodID_idx` (`prodID` ASC),
   INDEX `fk_custID_idx` (`custID` ASC),

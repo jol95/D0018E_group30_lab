@@ -33,7 +33,7 @@
     <div class="media border p-3">
         <img src="{{url_for('static', filename='resources/img_avatar3.png')}}" alt="John Doe" class="mr-3 mt-3 rounded-circle" style="width:60px;">
         <div class="media-body">
-        <h4>{{data.0}} <small><i>Posted on {{data.1}}</i></small></h4>
+        <h4>{{data.0}} <small><i>Posted on {{data.1}} Rated {{ data.3 }}/5</i></small></h4>
         <p>{{data.2}}</p>      
         </div>
     </div>
@@ -48,6 +48,14 @@
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
                 <legend class="border-bottom">Feel free to leave a review!</legend>
+                <div class="">
+                    {% for subfield in form.stars %}
+                        <tr>
+                            <td>{{ subfield }}</td>
+                            <td>{{ subfield.label }}</td>
+                        </tr>
+                    {% endfor %}
+                </div>
                 <div class="form-group">
                     {{ form.text.label(class="form-control-label") }}
 
