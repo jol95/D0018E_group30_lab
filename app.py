@@ -344,7 +344,7 @@ def upload_file(pic_filename):
     #picture_fn = secure_filename(pic_filename.filename)
     #_, f_ext = os.path.splittext(pic_filename.filename)
     #picture_fn =  + f_ext
-    picture_path = os.path.join(app.config['UPLOAD_FOLDER'], pic_filename)
+    picture_path = os.path.join(app.route_path, 'static/resources', pic_filename)
 
     standard_size = (125, 125)
     pic = Image.open(pic_filename)
@@ -372,19 +372,19 @@ def customerMypage():
             i = upload_file(form.picture.data)
             profile_pic = srt(i)
 
-        fname = str(editCust.first_name.data)
-        lname = str(editCust.last_name.data)
-        email = str(editCust.email.data)
-        addr = str(editCust.home_address.data)
-        pcode = str(editCust.post_code.data)
-        country = str(editCust.country.data)
-        phone = str(editCust.phone_number.data)
+        fname = str(form.first_name.data)
+        lname = str(form.last_name.data)
+        email = str(form.email.data)
+        addr = str(form.home_address.data)
+        pcode = str(form.post_code.data)
+        country = str(form.country.data)
+        phone = str(form.phone_number.data)
         update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.address="%s", a.postcode="%s", \
                    a.country="%s", a.phoneno="%s", a.profilepic=%"s"' % (fname, lname, email, addr, pcode, country, phone, profile_pic)
 
         cond = 'custID = %s' % (str(request.args.get('custid')))
         updateAll('customers as a', update, cond)
-     
+
         flash('Your Account Info Has Been Updated!', 'success')
         return redirect(url_for('customerMypage'))
 
