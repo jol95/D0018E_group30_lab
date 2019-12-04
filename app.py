@@ -57,25 +57,31 @@ def index():
     prod = getTable('products')
     return render_template('index.html', prod = prod)
 
-
 ## PRODUCT PAGE ##
 @app.route('/product', methods=['GET', 'POST'])
 def product():
     form = ReviewForm()
     args = request.args
     item = getRow('products', 'prodID='+args.get("id"))
-    rev = getTable('reviews WHERE prodID=%s'%(item[0]))
+    ## GET REVIEWS ##
+    attr = 'customers.firstname, reviews.date, reviews.text, reviews.stars'
+    join = 'customers ON reviews.custID = customers.custID'
+    cond = 'reviews.prodID=%s' %(item[0])
+    rev = innerJoin('reviews', attr, join, cond)
+
     ## SUBMITTING REVIEWS ##
     if request.method=='POST':
+        x = datetime.datetime.now()
+        date = str(x)
         prodID = item[0]
         custID = str(session['userid'])
         text = form.text.data
-        date = '12'
-        attr = 'prodID, custID, text, date'
-        val = '%s, %s, "%s", %s' %(prodID, custID, text, date)
+        stars = form.stars.data
+        attr = 'prodID, custID, text, date, stars'
+        val = '%s, %s, "%s", "%.16s", %s' %(prodID, custID, text, date, stars)
         insertTo('reviews', attr, val)
         flash('Thank you for leaving a review!', 'success')
-        return redirect('/')
+        return redirect('/product?id=%s' %item[0])
     return render_template('productpage.html', item = item, form=form, rev=rev)
 
 
