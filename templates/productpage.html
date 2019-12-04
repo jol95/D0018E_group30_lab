@@ -16,19 +16,33 @@
             {% endif %}
         </div>
     </div>
-    <div class="name"><h1>{{item.1}}</h1></div>
+    <div class="name"><h3>{{item.1}}</h3></div>
     <div class="prodID">{{item.0}}</div>
     <div class="desc">{{ item.2 }}</div>
     <div class="addtocart"><a href="/addtocart?id={{item.0}}&qty=1">Add to cart</a></div>
+    </br>
 
 </div>
 
 {# VISA REVIEWS FÖR PRODUKTEN #}
-<div class ="grid-container">
+    <div class="listreview ">
+       <h3>Customer Reviews</h3>
+    </div>
+<div class ="rev">
     {% for data in rev: %}
         <div class="listreview">
-            {{ data.3 }}
+             Date: {{ data.1 }}
         </div>
+        <div class="listreview">
+            Author: {{ data.0 }}
+        </div>
+        <div class="listreview">
+            Rating: {{ data.3 }}/5
+        </div>
+        <div class="listreview">
+            Comment: {{ data.2 }}
+        </div>
+        </br>
     {% endfor %}
 </div>
 
@@ -40,9 +54,16 @@
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
                 <legend class="border-bottom">Feel free to leave a review!</legend>
+                <div class="">
+                    {% for subfield in form.stars %}
+                        <tr>
+                            <td>{{ subfield }}</td>
+                            <td>{{ subfield.label }}</td>
+                        </tr>
+                    {% endfor %}
+                </div>
                 <div class="form-group">
                     {{ form.text.label(class="form-control-label") }}
-
                     {% if form.text.errors %}
                         {{ form.text(class="form-
                         control form-control-lg is-invalid") }}
@@ -66,3 +87,4 @@
 
 
 {% endblock content %}
+                        
