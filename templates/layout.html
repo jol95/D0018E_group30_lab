@@ -7,7 +7,7 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main1.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
     {% block stylesheets %}
@@ -29,17 +29,15 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="/">Home</a>
               <a class="nav-item nav-link" href="/products">Products</a>
-              <a class="nav-item nav-link" href="/about">About</a>
             </div>
             <!-- Searchbar -->
-            <div class="navbar-nav mr-auto">
-              <div class="input-group mb-3">
+            <div class="navbar-nav mr-auto d-flex">
+              <div class="input-group mb-3 d-flex">
                 <form class="input-group" method="POST" action="{{ url_for('index') }}">
-                  <input type="text" class="form-control" style="width:500px;" name="searchword" placeholder="Search by product name or number">
-                  <div class="input-group-append">
-                    <button class="btn btn-primary" type="submit">Go</button>
+                  <input type="text" class="form-control" style="max-width:100%; width: 350px;" name="searchword" placeholder="Search by product name or number">
+                  <div class="input-group-appendd d-flex">
+                    <button class="btn btn-primary" type="submit"><i class='fas fa-search' style='font-size:16px'></i></button>
                   </div>
                 </form>
               </div>

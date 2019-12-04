@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, IntegerField, SubmitField, BooleanField, TextAreaField, FileField, DecimalField
+from wtforms import StringField, PasswordField, IntegerField, SubmitField, BooleanField, TextAreaField, DecimalField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
-
+from flask_wtf.file import FileField, FileAllowed, FileRequired
+from flask_uploads import UploadSet, IMAGES
 
 class RegistrationForm(FlaskForm):
     first_name = StringField('First name', validators=[DataRequired()])
@@ -33,12 +34,17 @@ class adminProdSearch(FlaskForm):
     submit = SubmitField('search')
 
 class adminProdEdit(FlaskForm):
-    name = StringField('Name')
-    desc = TextAreaField('Description')
-    price = IntegerField('Price')
-    img = FileField('Image')
-    stock = IntegerField('Stock')
-    cat = StringField('Category')
-    discount = DecimalField('Discount')
+    images = UploadSet('images', IMAGES)
+    name = StringField('Name', validators=[DataRequired()])
+    desc = TextAreaField('Description', validators=[DataRequired()])
+    price = IntegerField('Price', validators=[DataRequired()])
+    img = FileField('Image', validators=[
+        FileRequired(),
+        FileAllowed(images, 'Images only!'),
+        DataRequired()
+    ])
+    stock = IntegerField('Stock', validators=[DataRequired()])
+    cat = StringField('Category', validators=[DataRequired()])
+    discount = DecimalField('Discount', validators=[DataRequired()])
 
     submit = SubmitField('Update')

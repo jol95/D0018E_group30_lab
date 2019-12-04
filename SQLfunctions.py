@@ -13,7 +13,6 @@ mysql = MySQLdb.connect(mysql_host, mysql_user, mysql_pw, mysql_db)
 mysql.autocommit(False)
 
 # This function returns all contents of a table.
-#def getTable(table, mysql):
 def getTable(table):
     query = 'SELECT * FROM '+table
     return fetchall(query)

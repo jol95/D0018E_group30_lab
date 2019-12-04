@@ -8,67 +8,86 @@
 {% endblock %}
 
 {% block content %}
-{# VISA PRODUKTEN PÅ SIDAN BRUSH #}
-<div class="grid-container">
-    <div class="img">
-        <div class="img">
-            {% if item.4 == '' %}
-            <img src="{{ url_for('static', filename='resources/noimg.jpg') }}" alt="noimg" class="prodimg"/>
-            {% else %}
-            <img src="{{ url_for('static', filename='resources/') }}{{ item.4 }}" alt="{{item.4}}" class="prodimg"/>
+<div class="d-flex card">
+    {# VISA PRODUKTEN PÅ SIDAN BRUSH #}
+    <div class="d-flex card-body">
+        <div class="d-flex">
+            <img src="{{ url_for('static', filename='resources/') }}{{ item.4 }}" alt="{{item.4}}" class="img rounded"/>
+        </div>
+        <div class="d-flex flex-column" style="max-width: 700px; width: 100%;">
+            <div class="d-flex"><h1 class="m-0">{{item.1}}</h1></div>
+            <div class="p-2">
+                <h6>Description:</h6>
+                <p>{{ item.2 }}</p>
+            </div>
+            <div class="p-2"><h4>{{ item.3 }} SEK</h4></div>
+            <div class="d-flex">
+                <form method="POST" action="{{ url_for('addtocart')}}?id={{item.0}}" class="d-flex">
+                    <select name="qty" class="custom-select">
+                        <option selected value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5+</option>
+                    </select>
+                    &nbsp;
+                    <button type="submit" class="btn btn-primary btn-sm">Buy</button>
+                </form>
+            </div>
+            {% if 'userid' in session %}
+            <div class="d-flex">
+                <a href="#writereview">Review this product</a>
+            </div>
             {% endif %}
         </div>
     </div>
-    <div class="name"><h1>{{item.1}}</h1></div>
-    <div class="prodID">{{item.0}}</div>
-    <div class="desc">{{ item.2 }}</div>
-    <div class="addtocart"><a href="/addtocart?id={{item.0}}&qty=1">Add to cart</a></div>
 
-</div>
-
-{# VISA REVIEWS FÖR PRODUKTEN #}
-<div class="container mt-3">
-    <h5>Product review</h5>
-    {% for data in rev %}
-    <div class="media border p-3">
-        <img src="{{url_for('static', filename='resources/img_avatar3.png')}}" alt="John Doe" class="mr-3 mt-3 rounded-circle" style="width:60px;">
-        <div class="media-body">
-        <h4>{{data.0}} <small><i>Posted on {{data.1}}</i></small></h4>
-        <p>{{data.2}}</p>      
+    {# VISA REVIEWS FÖR PRODUKTEN #}
+    <div class="card-footer">
+        <h4>Product review</h5>
+        {% if rev %}
+        {% for data in rev %}
+        <div class="media border p-2 m-2 white">
+            <img src="{{url_for('static', filename='resources/img_avatar3.png')}}" alt="John Doe" class="mr-3 mt-3 rounded-circle" style="width:60px;">
+            <div class="media-body">
+            <h4>{{data.0}} <small><i>Posted on {{data.1}}</i></small></h4>
+            <p>{{data.2}}</p>      
+            </div>
         </div>
+        {% endfor %}
+        {% else %}
+        <p>This product has not yet been reviewed.</p>
+        {% endif %}
     </div>
-    {% endfor %}
 </div>
-
-
 {# FÖR ATT LÄMNA IN REVIEW #}
 {% if 'userid' in session %}
-    <div class="grid-container mt-4">
-        <form method="POST" action="">
-            {{ form.hidden_tag() }}
-            <fieldset class="form-group">
-                <legend class="border-bottom">Feel free to leave a review!</legend>
-                <div class="form-group">
-                    {{ form.text.label(class="form-control-label") }}
+<div class="grid-container mt-4" id="writereview">
+    <form method="POST" action="{{ url_for('product')}}?action=addreview&id={{item.0}}">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom">Feel free to leave a review!</legend>
+            <div class="form-group">
+                {{ form.text.label(class="form-control-label") }}
 
-                    {% if form.text.errors %}
-                        {{ form.text(class="form-
-                        control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.text.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                         {{ form.text(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.submit(class="btn btn-outline-info") }}
-                </div>
-            </fieldset>
-        </form>
-    </div>
+                {% if form.text.errors %}
+                    {{ form.text(class="form-
+                    control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.text.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                        {{ form.text(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </fieldset>
+    </form>
+</div>
 {% endif %}
 
 
