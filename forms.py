@@ -25,6 +25,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 class ReviewForm(FlaskForm):
+    stars = RadioField('Rate', choices=[('1',''),('2',''), ('3',''), ('4',''), ('5','')], default='3', validators=[DataRequired()])
     text = TextAreaField('', validators=[DataRequired()])
 
     submit = SubmitField('Submit Review')
