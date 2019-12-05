@@ -405,12 +405,13 @@ def customerMypage():
                    a.country="%s", a.phoneno="%s", a.profilepic="%s"' % (fname, lname, email, addr, pcode, country, phone, profile_pic)
 
         cond = 'custID = %s' % (str(request.args.get('custid')))
-        print "databas"
+        print fname
+        print profile_pic
         updateAll('customers as a', update, cond)
 
         flash('Your Account Info Has Been Updated!', 'success')
         #return redirect(url_for('customerMypage'))
-    
+
     print "adding image"
     image_file = url_for('static', filename='resources/' + profile_pic)
 
