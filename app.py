@@ -407,6 +407,7 @@ def customerMypage():
         print email
         print addr
         print profile_pic
+	print hashed_password
         updateAll('customers', update, cond)
 
         flash('Your Account Info Has Been Updated!', 'success')
