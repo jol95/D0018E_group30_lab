@@ -407,8 +407,8 @@ def customerMypage():
         print email
         print addr
         print profile_pic
-	print hashed_password
-        updateAll('customers', update, cond)
+        print hashed_password
+        updateAll('customers as a', update, cond)
 
         flash('Your Account Info Has Been Updated!', 'success')
         #return redirect(url_for('customerMypage'))
