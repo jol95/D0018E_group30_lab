@@ -45,6 +45,7 @@ class customerMypageform(FlaskForm):
     first_name = StringField('First name', validators=[DataRequired()])
     last_name = StringField('Last name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
     home_address = StringField('Home Address', validators=[DataRequired()])
     post_code = StringField('Post Code', validators=[DataRequired()])
     phone_number = StringField('Phone Number', validators=[DataRequired()])
