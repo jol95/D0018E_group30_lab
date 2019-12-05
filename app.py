@@ -87,9 +87,8 @@ def product():
     form = ReviewForm()
     args = request.args
     item = getRow('products', 'prodID='+args.get("id"))
-
     ## GET REVIEWS ##
-    attr = 'customers.firstname, reviews.date, reviews.text'
+    attr = 'customers.firstname, reviews.date, reviews.text, reviews.stars'
     join = 'customers ON reviews.custID = customers.custID'
     cond = 'reviews.prodID=%s' %(item[0])
     rev = innerJoin('reviews', attr, join, cond)

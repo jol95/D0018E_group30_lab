@@ -42,7 +42,6 @@
         </div>
     </div>
 
-    {# VISA REVIEWS FÖR PRODUKTEN #}
     <div class="card-footer">
         <h4>Product review</h5>
         {% if rev %}
@@ -62,14 +61,21 @@
 </div>
 {# FÖR ATT LÄMNA IN REVIEW #}
 {% if 'userid' in session %}
-<div class="grid-container mt-4" id="writereview">
-    <form method="POST" action="{{ url_for('product')}}?action=addreview&id={{item.0}}">
-        {{ form.hidden_tag() }}
-        <fieldset class="form-group">
-            <legend class="border-bottom">Feel free to leave a review!</legend>
-            <div class="form-group">
-                {{ form.text.label(class="form-control-label") }}
-
+    <div class="grid-container mt-4">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom">Feel free to leave a review!</legend>
+                <div class="">
+                    {% for subfield in form.stars %}
+                        <tr>
+                            <td>{{ subfield }}</td>
+                            <td>{{ subfield.label }}</td>
+                        </tr>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    {{ form.text.label(class="form-control-label") }}
                 {% if form.text.errors %}
                     {{ form.text(class="form-
                     control form-control-lg is-invalid") }}
