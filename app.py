@@ -370,6 +370,7 @@ def upload_file(pic_filename):
 
 @app.route("/customerMypage", methods=['GET', 'POST'])
 def customerMypage():
+    print 'hej'
     form = customerMypageform()
     if 'userid' not in session:
         flash('Please log in or create an account.', 'danger')
@@ -393,15 +394,15 @@ def customerMypage():
                 flash('File Extention Is Not Allowed', 'success')
 
 
-        fname = form.first_name.data
-        lname = form.last_name.data
-        email = form.email.data
+        fname = str(form.first_name.data)
+        lname = str(form.last_name.data)
+        email = str(form.email.data)
         hashed_password = str(generate_password_hash(form.password.data))
-        addr = form.home_address.data
-        pcode = form.post_code.data
+        addr = str(form.home_address.data)
+        pcode = str(form.post_code.data)
         country = form.country.data
-        phone = form.phone_number.data
-        update = 'a.firstname=%s, a.lastname=%s, a.email="%s", a.password="%s", a.address=%s, a.postcode=%s, a.country=%s, a.phoneno=%s, a.profilepic=%s' %(fname, lname, hashed_password, email, addr, pcode, country, phone, profile_pic)
+        phone = str(form.phone_number.data)
+        update = 'firstname="%s", lastname="%s", email="%s", password="%s", address="%s", postcode="%s", country="%s", phoneno="%s", profilepic="%s"' %(fname, lname, hashed_password, email, addr, pcode, country, phone, profile_pic)
         cond = 'custID = %s' %(str(request.args.get('custid')))
         print fname
         print email
