@@ -388,8 +388,8 @@ def customerMypage():
                 filename = secure_filename(image.filename)
                 image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 profile_pic = filename
-                print SPARAT BILD
-                print filename
+                print SPARAT
+                print str(filename)
             else:
                 flash('File Extention Is Not Allowed', 'success')
 
