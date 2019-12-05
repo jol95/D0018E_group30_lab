@@ -401,8 +401,7 @@ def customerMypage():
         pcode = str(form.post_code.data)
         country = str(form.country.data)
         phone = str(form.phone_number.data)
-        update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.password="%s", a.address="%s", a.postcode="%s", a.country="%s", a.phoneno="%s", a.profilepic="%s"' %(fname, lname, hashed_password, email, addr, pcode, country, phone, profile_pic)
-
+        update = 'a.firstname=%s, a.lastname=%s, a.email=%s, a.password=%s, a.address=%s, a.postcode=%s, a.country=%s, a.phoneno=%s, a.profilepic=%s' %(fname, lname, hashed_password, email, addr, pcode, country, phone, profile_pic)
         cond = 'custID = %s' %(str(request.args.get('custid')))
         print fname
         print email
