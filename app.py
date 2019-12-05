@@ -396,7 +396,7 @@ def customerMypage():
         fname = form.first_name.data
         lname = form.last_name.data
         email = form.email.data
-        hashed_password = generate_password_hash(form.password.data)
+        hashed_password = str(generate_password_hash(form.password.data))
         addr = form.home_address.data
         pcode = form.post_code.data
         country = form.country.data
