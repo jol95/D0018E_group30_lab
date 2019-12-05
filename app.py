@@ -405,6 +405,8 @@ def customerMypage():
 
         cond = 'custID = %s' %(str(request.args.get('custid')))
         print fname
+        print email
+        print addr
         print profile_pic
         updateAll('customers', update, cond)
 
