@@ -94,12 +94,15 @@ def product():
     rev = innerJoin('reviews', attr, join, cond)
 
     ## SUBMITTING REVIEWS ##
-    if request.method=='POST' and request.args.get('action') == 'addreview':
+    if request.method=='POST':
+        x = datetime.datetime.now()
+        date = str(x)
         prodID = item[0]
         custID = str(session['userid'])
         text = form.text.data
-        attr = 'prodID, custID, text'
-        val = '%s, %s, "%s"' %(prodID, custID, text)
+        stars = form.stars.data
+        attr = 'prodID, custID, text, date, stars'
+        val = '%s, %s, "%s", "%.16s", %s' %(prodID, custID, text, date, stars)
         insertTo('reviews', attr, val)
         flash('Thank you for leaving a review!', 'success')
         return redirect('/product?id=%s' %item[0])
