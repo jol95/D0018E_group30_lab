@@ -387,7 +387,7 @@ def customerMypage():
             if allowed_image(image.filename):
                 filename = secure_filename(image.filename)
                 image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                profile_pic = filename
+                profile_pic = str(filename)
                 print "SPARAT"
                 print str(filename)
             else:
@@ -410,7 +410,8 @@ def customerMypage():
 
         flash('Your Account Info Has Been Updated!', 'success')
         #return redirect(url_for('customerMypage'))
-
+    
+    print "adding image"
     image_file = url_for('static', filename='resources/' + profile_pic)
 
     return render_template('customerMypage.html', image_file=image_file, form=form, data=data)
