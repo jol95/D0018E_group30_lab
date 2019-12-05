@@ -20,8 +20,10 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'Choss!95'
 app.config['MYSQL_DB'] = 'webshop'
 
-UPLOAD_FOLDER = '/static/resources'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER'] = '/var/www/html/static/resources'
+app.config['ALLOWED_IMAGE_EXTENSIONS'] = ["JPG", "PNG"]
+
+
 
 mysql = MySQL(app)
 
@@ -339,6 +341,18 @@ def admin_orders():
     return render_template('admin/orders.html')
 
 
+
+def allowed_image(filename):
+    if not "." in filename:
+        return False
+
+    ext = filename.rsplit(".", 1)[1]
+    if ext.upper() in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
+        return True
+    else:
+        return False
+
+
 def upload_file(pic_filename):
     #hex_rand = secrets.token_hex(8)
     #picture_fn = secure_filename(pic_filename.filename)
@@ -369,8 +383,14 @@ def customerMypage():
 
     if form.validate_on_submit():
         if form.picture.data:
-            i = upload_file(form.picture.data)
-            profile_pic = srt(i)
+            image = form.picture.data
+            if allowed_image(image.filename):
+                filename = secure_filename(image.filename)
+                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                profile_pic = filename
+            else:
+                flash('File Extention Is Not Allowed', 'success')
+
 
         fname = str(form.first_name.data)
         lname = str(form.last_name.data)
@@ -386,7 +406,7 @@ def customerMypage():
         updateAll('customers as a', update, cond)
 
         flash('Your Account Info Has Been Updated!', 'success')
-        return redirect(url_for('customerMypage'))
+        #return redirect(url_for('customerMypage'))
 
     image_file = url_for('static', filename='resources/' + profile_pic)
 
