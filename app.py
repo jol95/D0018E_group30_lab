@@ -402,14 +402,14 @@ def customerMypage():
         pcode = str(form.post_code.data)
         country = form.country.data
         phone = str(form.phone_number.data)
-        update = 'firstname="%s", lastname="%s", email="%s", password="%s", address="%s", postcode="%s", country="%s", phoneno="%s", profilepic="%s"' %(fname, lname, hashed_password, email, addr, pcode, country, phone, profile_pic)
+        update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.address="%s", a.postcode="%s", a.country="%s", a.profilepic="%s"' %(fname, lname, email, addr, pcode, countr, profile_pic)
         cond = 'custID = %s' %(str(request.args.get('custid')))
         print fname
         print email
         print addr
         print profile_pic
         print hashed_password
-        updateAll('customers', update, cond)
+        updateAll('customers as a', update, cond)
 
         flash('Your Account Info Has Been Updated!', 'success')
         #return redirect(url_for('customerMypage'))
