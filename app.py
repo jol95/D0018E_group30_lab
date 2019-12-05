@@ -385,9 +385,9 @@ def customerMypage():
         if form.picture.data:
             image = form.picture.data
             if allowed_image(image.filename):
-                filename = secure_filename(image.filename)
-                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                profile_pic = str(filename)
+                #filename = secure_filename(image.filename)
+                image.save(os.path.join(app.config['UPLOAD_FOLDER'], image))
+                profile_pic = image
 
             else:
                 flash('File Extention Is Not Allowed', 'success')
@@ -401,9 +401,9 @@ def customerMypage():
         pcode = form.post_code.data
         country = form.country.data
         phone = form.phone_number.data
-        update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.password="%s", a.address="%s", a.postcode="%s", a.country="%s", a.phoneno="%s", a.profilepic="%s"' %(fname, lname, hashed_password, email, addr, pcode, country, phone, profile_pic)
+        update = 'a.firstname=%s, a.lastname=%s, a.email=%s, a.password=%s, a.address=%s, a.postcode=%s, a.country=%s, a.phoneno=%s, a.profilepic=%s' %(fname, lname, hashed_password, email, addr, pcode, country, phone, profile_pic)
 
-        cond = 'custID = %s' %(str(request.args.get('custid')))
+        cond = 'custID = %s' %(request.args.get('custid'))
         print fname
         print profile_pic
         updateAll('customers', update, cond)
