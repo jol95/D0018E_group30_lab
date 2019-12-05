@@ -3,6 +3,8 @@
 from flask import *
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+import os
 
 # created libs
 from forms import *
@@ -20,7 +22,6 @@ app.config['MYSQL_PASSWORD'] = 'Choss!95'
 app.config['MYSQL_DB'] = 'webshop'
 
 mysql = MySQL(app)
-
 
 ## REGISTER PAGE ##
 @app.route("/register", methods=['GET', 'POST'])
@@ -68,11 +69,16 @@ def customerMypage():
     return render_template('customerMypage.html')
 
 ## INDEX PAGE ##
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    # Fetch all rows from product-table
-    prod = getTable('products')
-    return render_template('index.html', prod = prod)
+    # show search result
+    if request.method=='POST' and len(request.form.get('searchword')) :
+        res = getTable('products WHERE name LIKE "%'+request.form.get('searchword')+
+        '%" OR prodID LIKE "%'+request.form.get('searchword')+'%"')
+    else:
+        # Fetch all rows from product-table
+        res = getTable('products')
+    return render_template('index.html', prod = res)
 
 
 ## PRODUCT PAGE ##
@@ -88,22 +94,19 @@ def product():
     rev = innerJoin('reviews', attr, join, cond)
 
     ## SUBMITTING REVIEWS ##
-    if request.method=='POST':
-        x = datetime.datetime.now()
-        date = str(x)
+    if request.method=='POST' and request.args.get('action') == 'addreview':
         prodID = item[0]
         custID = str(session['userid'])
         text = form.text.data
-        stars = form.stars.data
-        attr = 'prodID, custID, text, date, stars'
-        val = '%s, %s, "%s", "%.16s", %s' %(prodID, custID, text, date, stars)
+        attr = 'prodID, custID, text'
+        val = '%s, %s, "%s"' %(prodID, custID, text)
         insertTo('reviews', attr, val)
         flash('Thank you for leaving a review!', 'success')
         return redirect('/product?id=%s' %item[0])
     return render_template('productpage.html', item = item, form=form, rev=rev)
 
 ## ADD TO CART FUNCTION ##
-@app.route('/addtocart')
+@app.route('/addtocart', methods=['GET', 'POST'])
 def addtocart():
     # redirect user to login page if not logged in
     if 'userid' not in session:
@@ -113,7 +116,7 @@ def addtocart():
     # attribute data for shoping cart
     custID = str(session['userid'])  # temporary customer ID (unregistred user)
     prodID = str(request.args.get('id')) # productID
-    qty = str(request.args.get('qty'))   # quantity
+    qty = str(request.form.get('qty')) if request.form.get('qty') else str(request.args.get('qty'))   # quantity
     cond = 'custID = '+custID+' AND prodID = '+prodID   # insert/update condition
     
     # check if the product already exists in users cart
@@ -358,11 +361,8 @@ def admin_products():
     # seach by item number or product name
     if request.method=='POST':
         searchWord = str(form.search.data)
-        cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM products WHERE name LIKE "%'+searchWord+\
-            '%" OR prodID LIKE "%'+searchWord+'%"')
-        res = cur.fetchall()
-        cur.close()
+        res = getTable('products WHERE name LIKE "%'+searchWord+
+        '%" OR prodID LIKE "%'+searchWord+'%"')
     else:
         res = getTable('products')      # default "show all products"
 
@@ -383,26 +383,39 @@ def admin_products_edit():
     # define page
     page = 'edit'
 
+    prodid = str(request.args.get('id'))
+
     # initalize edit form
     editform = adminProdEdit()
-
-    res = getRow('products', 'prodID ='+request.args.get('id'))
+    # return str(request.args.get('id'))
+    res = getRow('products', 'prodID ='+prodid)
 
     # update the product
     if request.method == 'POST':
         name = str(editform.name.data)
-        desc = str(editform.desc.data) if str(editform.desc.data) != "" else str(res[2])
+        desc = str(editform.desc.data) if str(editform.desc.data) else str(res[2])
         price = str(editform.price.data)
-        img = str(editform.img.data) if str(editform.img.data) != "" else str(res[4])
         stock = str(editform.stock.data)
         cat = str(editform.cat.data)
         disc = str(editform.discount.data)
-        update = 'a.name="%s", a.desc="%s", a.price=%s, a.img="%s", a.stock=%s, \
-            a.category="%s", a.discount=%s' %(name, desc, price, img, stock, cat, disc)
-        cond = 'prodID = %s' %(str(request.form.get('prodID')))
+        update = 'a.name="%s", a.desc="%s", a.price=%s, a.stock=%s, \
+            a.category="%s", a.discount=%s' %(name, desc, price, stock, cat, disc)
+        cond = 'prodID = %s' %(prodid)
         updateAll('products as a', update, cond)
+
+        # upload picture to static/resources/ and set the prodID as filename
+        if editform.img.data:
+            prodid = getOne('products', 'prodID',
+            'name="{}"'.format(str(editform.name.data)))[0]
+            fileextension = editform.img.data.filename[-4:]
+            filename = secure_filename(str(prodid)+fileextension)
+            editform.img.data.save('static/resources/'+filename)
+            updateAll('products', 'img="{}"'.format(filename), 'prodID={}'.format(prodid))
+
         flash('Update sucessfull!', 'success')
-        return redirect('/admin/product/edit?id='+str(res[0]))
+        return redirect(url_for('admin_products')+'?id='+str(request.args.get('id')))
+    else:
+        editform.desc.data = res[2]
     return render_template('admin/products.html', p=page, form=editform, item=res)
 
 ## ADMIN - ADD PRODUCT PAGE ##
@@ -425,14 +438,23 @@ def admin_products_add():
         name = str(addform.name.data)
         desc = addform.desc.data
         price = str(addform.price.data) if str(addform.price.data) != "" else '0'
-        img = str(addform.img.data) if str(addform.img.data) !="" else 'noimg.jpg'
+        img = str(addform.img.data.filename) if addform.img.data else 'noimg.jpg'
         stock = str(addform.stock.data) if str(addform.stock.data) != "" else '0'
         cat = str(addform.cat.data) if str(addform.cat.data) != "" else ''
-        
+
         # product table attributes and values
         attr = '`name`, `price`, `stock`, `img`, `category`, `desc`, `discount`'
         val = '"%s", %s, %s, "%s", %s, "%s", 0' %(name, price, stock, img, cat, desc)
         res = insertTo('products', attr, val)
+
+        # upload picture to static/resources/ and set the prodID as filename
+        if addform.img.data:
+            prodid = getOne('products', 'prodID',
+            'name="{}"'.format(str(addform.name.data)))[0]
+            fileextension = addform.img.data.filename[-4:]
+            filename = secure_filename(str(prodid)+fileextension)
+            addform.img.data.save('static/resources/'+filename)
+            updateAll('products', 'img="{}"'.format(filename), 'prodID={}'.format(prodid))
 
         # flash success to user
         flash('The product has been added!', 'success')
@@ -450,7 +472,10 @@ def admin_products_delete():
     
     # delete the product and flash the user on success
     removeProd = request.args.get('id')
+    filename = getOne('products', 'img',
+            'prodID={}'.format(removeProd))[0]
     deleteFrom('products', 'prodID='+removeProd)
+    os.remove('static/resources/'+filename)
     flash('Item# '+removeProd+' has been successfully removed!', 'success')
     return redirect(url_for('admin_products'))
 

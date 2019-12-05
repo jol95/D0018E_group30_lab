@@ -9,11 +9,9 @@
     {% for items in prod %}
     <div class="col">
         <div class="card" style="width:250px; height: 450px; float: left; margin: 5px;">
-            {% if items.4 %}
+            <a href="{{url_for('product')}}?id={{items.0}}">
             <img class="card-img-top" src="{{ url_for('static', filename='resources/') }}{{ items.4 }}" alt="{{ items.4 }}" style="width:100%">
-            {% else %}
-            <img class="card-img-top" src="{{ url_for('static', filename='resources/noimg.jpg')}}" alt="" style="width:100%">
-            {% endif %}
+            </a>
             <div class="card-body">
                 <h4 class="card-title"><a href="{{url_for('product')}}?id={{items.0}}">{{ items.1 }}</a></h4>
                 <p class="card-text">{{ items.3 }} SEK</p>

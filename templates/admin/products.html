@@ -45,8 +45,20 @@
 </div>
 {% elif p == 'edit' %}
 {# PRODUCT EDIT PAGE #}
-<div class="table">
-    <div class="titlerow">Product: {{ item.1 }} Item#: {{ item.0 }}</div>
+<div class="table d-flex">
+    <div class="d-flex">
+        <div class="d-flex">
+                <img src="{{ url_for('static', filename='resources/') }}{{ item.4 }}" alt="{{item.4}}" class="rounded" width="100" height="100"/>
+        </div>
+        <div class="d-flex flex-column p-2">
+            <div class="d-flex">Item#: {{ item.0 }}</div>
+            <div class="d-flex">Product: {{ item.1 }}</div>
+            <div>
+                <a href="{{ url_for('admin_products_edit') }}?id={{item.0}}&changeimg=true" class="badge badge-primary">Change picture</a>
+            </div>
+        </div>
+    </div>
+</div>
     {% if request.args.get('confirm') == 'delete' %}
     <div class="itemrows">Are you sure you want to delete this product?</div>
     <div class="itemrows">
@@ -54,7 +66,7 @@
         <a href="{{ url_for('admin_products_edit') }}?id={{ item.0 }}" class="btn btn-primary mb-2">Cancel</a>
     </div>
     {% else %}
-    <form method="POST" action="">
+    <form method="POST" action="{{url_for('admin_products_edit')}}?id={{item.0}}" enctype="multipart/form-data">
         <div class="itemrows">
             {{form.name.label}}
             {{form.name(class='form-control mb-2 mr-sm-2', value=item.1)}}
@@ -80,11 +92,12 @@
             {{form.cat(class='form-control mb-2 mr-sm-2', value=item.6)}}
         </div>
         <div class="itemrows">
-            {{form.img.label}}: <img src="{{ url_for('static', filename='resources/') }}{{ item.4 }}" alt="{{item.4}}" class="img-rounded" width="100" height="100"/>
-            {{ form.img(class='form-control mb-2 mr-sm-2', value=item.4) }}
-            <input name="prodID" type="text" value="{{ item.0 }}" style="display: none;">
+            {% if request.args.get('changeimg') == 'true' %}
+            {{form.img.label}}:
+            {{ form.img(class='form-control mb-2 mr-sm-2') }}
+            {% endif %}
         </div>
-        <div class="itemrows">
+        <div class="itemrows" style="border-top: 1px solid black; margin-top: 10px; padding-top: 5px;">
             {{form.submit(class='btn btn-primary mb-2')}}
             <a href="{{ url_for('admin_products_edit') }}?id={{ item.0}}&confirm=delete" class="btn btn-primary mb-2">Delete</a>
             <a href="{{ url_for('admin_products' )}}" class="btn btn-primary mb-2">Cancel</a>
@@ -96,7 +109,7 @@
 {# PRODUCT ADD PAGE #}
 <div class="table">
     <div class="titlerow">New product</div>
-    <form method="POST" action="">
+    <form method="POST" action="" enctype="multipart/form-data">
         <div class="itemrows">
             {{form.name.label}}
             {{form.name(class='form-control mb-2 mr-sm-2')}}
@@ -117,11 +130,11 @@
             {{form.cat.label}}
             {{form.cat(class='form-control mb-2 mr-sm-2')}}
         </div>
-        <div class="itemrows">
-            {{form.img.label}}:
-            {{ form.img(class='form-control mb-2 mr-sm-2') }}
+        <div class="itemrows custom-file">
+            {{form.img.label(class='custom-file-label')}}:
+            {{ form.img(class='form-control mb-2 mr-sm-2, custom-file-input') }}
         </div>
-        <div class="itemrows">
+        <div class="itemrows" style="padding-top: 5px;">
             {{form.submit(class='btn btn-primary mb-2', value="Add product")}}
             <a href="{{ url_for('admin_products' )}}" class="btn btn-primary mb-2">Cancel</a>
         </div>
