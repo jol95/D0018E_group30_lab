@@ -400,7 +400,7 @@ def customerMypage():
         country = str(form.country.data)
         phone = str(form.phone_number.data)
         update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.address="%s", a.postcode="%s", \
-                   a.country="%s", a.phoneno="%s", a.profilepic=%"s"' % (fname, lname, email, addr, pcode, country, phone, profile_pic)
+                   a.country="%s", a.phoneno="%s", a.profilepic="%s"' % (fname, lname, email, addr, pcode, country, phone, profile_pic)
 
         cond = 'custID = %s' % (str(request.args.get('custid')))
         updateAll('customers as a', update, cond)
