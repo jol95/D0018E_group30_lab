@@ -388,6 +388,8 @@ def customerMypage():
                 filename = secure_filename(image.filename)
                 image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 profile_pic = filename
+                print SPARAT BILD
+                print filename
             else:
                 flash('File Extention Is Not Allowed', 'success')
 
@@ -403,6 +405,7 @@ def customerMypage():
                    a.country="%s", a.phoneno="%s", a.profilepic="%s"' % (fname, lname, email, addr, pcode, country, phone, profile_pic)
 
         cond = 'custID = %s' % (str(request.args.get('custid')))
+        print SKA LAGGA IN I DATABAS
         updateAll('customers as a', update, cond)
 
         flash('Your Account Info Has Been Updated!', 'success')
