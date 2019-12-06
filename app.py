@@ -3,23 +3,25 @@
 from flask import *
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
 import os
+from PIL import Image
+from werkzeug.utils import secure_filename
 
-# created libs
-from forms import *
 from SQLfunctions import *
-import datetime
+from forms import *
 
-
+# Initiate Flask app
 app = Flask(__name__)
-
-app.config['SECRET_KEY'] = 'bdb878ef8ea259ef877a3686726cf4f9'
+app.secret_key = "abc"
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'Choss!95'
 app.config['MYSQL_DB'] = 'webshop'
+
+app.config['UPLOAD_FOLDER'] = '/var/www/html/static/resources'
+app.config['ALLOWED_IMAGE_EXTENSIONS'] = ["JPG", "PNG"]
+
 
 mysql = MySQL(app)
 
@@ -29,18 +31,30 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
-        profile_pic = 'default.jpg'
-        hashed_password = generate_password_hash(form.password.data)
-        cur.execute('INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno, profilepic)'
-                    ' VALUE(%s,%s,%s,%s,%s,%s,%s, %s, %s)',(form.first_name.data, form.last_name.data, form.email.data,
-                                                        hashed_password, form.home_address.data,form.post_code.data,
-                                                        form.country.data, form.phone_number.data, profile_pic))
-        mysql.connection.commit()
-        flash('You Have Created An Account!', 'success')
-        return redirect('/')
+        email = form.email.data
+        cur.execute('SELECT * FROM customers WHERE email = %s', [email])
+        data = cur.fetchall()
+
+        if len(data) > 0:
+            flash('Email Already exist!', 'danger')
+
+        else:
+            cur = mysql.connection.cursor()
+            profile_pic = 'default.jpg'
+            hashed_password = generate_password_hash(form.password.data)
+            cur.execute(
+                'INSERT INTO customers (firstname,lastname,email, password, address, postcode, country, phoneno, profilepic)'
+                ' VALUE(%s,%s,%s,%s,%s,%s,%s, %s, %s)', (form.first_name.data, form.last_name.data, form.email.data,
+                                                         hashed_password, form.home_address.data, form.post_code.data,
+                                                         form.country.data, form.phone_number.data, profile_pic))
+            mysql.connection.commit()
+            flash('You Have Created An Account!', 'success')
+            return redirect('/')
+
     return render_template('register.html', form=form)
 
 
+## LOGIN PAGE ##
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -54,7 +68,6 @@ def login():
             if check_password_hash(str(data[0][4]), form.password.data):
                 session['userid'] = data[0][0]
                 session['username'] = data[0][1]
-
                 flash('You Are Now Logged In!', 'success')
                 return redirect('/')
             else:
@@ -63,10 +76,6 @@ def login():
             flash('Invalid Email Or Password', 'danger')
     return render_template('login.html', form=form)
 
-@app.route("/customerMypage")
-def customerMypage():
-
-    return render_template('customerMypage.html')
 
 ## INDEX PAGE ##
 @app.route('/', methods=['GET', 'POST'])
@@ -148,7 +157,7 @@ def cart():
     # getting cart
     attr = 'cart.prodID, products.name, products.price, cart.qty'
     join = 'products ON cart.prodID = products.prodID'
-    cond = 'cart.custID ='+str(session['userid'])
+    cond = 'cart.custID = '+str(session['userid'])
     cart = innerJoin('cart', attr, join, cond)
     lenofcart = len(cart)
 
@@ -297,7 +306,7 @@ def admin_customers():
         res = getTable('customers WHERE firstname LIKE "%'+searchWord+\
             '%" OR lastname LIKE "%'+searchWord+'%" OR custID LIKE "%'+searchWord+\
                 '%" OR email LIKE "%'+searchWord+'%"')
-        
+
         # flash message if customer not found
         if len(res):
             page = 'searchresult'
@@ -361,7 +370,7 @@ def admin_products():
     # initialize searchbar
     form = adminProdSearch()
 
-    # seach by item number or product name
+    # search by item number or product name
     if request.method=='POST':
         searchWord = str(form.search.data)
         res = getTable('products WHERE name LIKE "%'+searchWord+
@@ -567,6 +576,80 @@ def dateFormat(data):
 @app.template_filter()
 def currencyFormat(value):
     return '{:,.2f} SEK'.format(float(value))
+
+
+
+def allowed_image(filename):
+    if not "." in filename:
+        return False
+
+    ext = filename.rsplit(".", 1)[1]
+    if ext.upper() in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
+        return True
+    else:
+        return False
+
+
+def upload_file(pic_filename):
+    #hex_rand = secrets.token_hex(8)
+    #picture_fn = secure_filename(pic_filename.filename)
+    #_, f_ext = os.path.splittext(pic_filename.filename)
+    #picture_fn =  + f_ext
+    picture_path = os.path.join(app.config['UPLOAD_FOLDER'], pic_filename)
+
+    standard_size = (125, 125)
+    pic = Image.open(pic_filename)
+    pic.thumbnail(standard_size)
+    pic.save(picture_path)
+    return picture_fn
+
+
+
+@app.route("/customerMypage", methods=['GET', 'POST'])
+def customerMypage():
+
+    form = customerMypageform()
+    if 'userid' not in session:
+        flash('Please log in or create an account.', 'danger')
+        return redirect(url_for('login'))
+
+    cur = mysql.connection.cursor()
+    custID = str(session['userid'])
+    cur.execute('SELECT * FROM customers WHERE custID = %s', [custID])
+    data = cur.fetchone()
+    profile_pic = data[9]
+
+    if form.validate_on_submit():
+        if form.picture.data:
+            image = form.picture.data
+            if allowed_image(image.filename):
+                filename = secure_filename(image.filename)
+                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                profile_pic = str(filename)
+
+            else:
+                flash('File Extention Is Not Allowed', 'success')
+
+
+        fname = str(form.first_name.data)
+        lname = str(form.last_name.data)
+        email = str(form.email.data)
+        hashed_password = str(generate_password_hash(form.password.data))
+        addr = str(form.home_address.data)
+        pcode = str(form.post_code.data)
+        country = form.country.data
+        phone = str(form.phone_number.data)
+        update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.password="%s",a.address="%s", a.postcode="%s", a.country="%s",a.phoneno="%s", a.profilepic="%s"' %(fname, lname, email, hashed_password, addr, pcode, country, phone, profile_pic)
+        cond = 'custID = %s' %(data[0])
+
+        updateAll('customers as a', update, cond)
+
+        flash('Your Account Info Has Been Updated!', 'success')
+        return redirect(url_for('customerMypage'))
+
+    image_file = url_for('static', filename='resources/' + profile_pic)
+
+    return render_template('customerMypage.html', image_file=image_file, form=form, data=data)
 
 if __name__ == "__main__":
     app.debug=True
