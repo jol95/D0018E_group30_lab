@@ -7,15 +7,15 @@
 {% block content %}
 {% if p == 'searchresult' or p == '' %}
 <div class="header">Admin: Customers/{{p}}</div>
+<form method="POST" action="{{ url_for('admin_customers')}}">
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <button class="btn btn-outline-primary" type="submit"><i class='fas fa-search' style='font-size:16px'></i></button>
+        </div>
+        {{form.search(class='form-control', placeholder='Search by customer number, name or e-mail')}}
+    </div>
+</form>
 <div class="menu">
-    <form method="POST" action="{{ url_for('admin_customers')}}" class="menu">
-        <div>
-            {{form.search(class='searchbar', placeholder='Search by customer number, name or e-mail')}}
-        </div>
-        <div>
-            {{form.submit(class='btn btn-primary mb-2')}}
-        </div>
-    </form>
     <div>
         <ul class="menu-list">
             <li><a href="{{ url_for('admin_customers') }}?page=showall" class="btn btn-primary mb-2">Show all customers</a></li>
