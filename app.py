@@ -370,7 +370,7 @@ def upload_file(pic_filename):
 
 @app.route("/customerMypage", methods=['GET', 'POST'])
 def customerMypage():
-    
+
     form = customerMypageform()
     if 'userid' not in session:
         flash('Please log in or create an account.', 'danger')
@@ -388,9 +388,10 @@ def customerMypage():
             if allowed_image(image.filename):
                 filename = secure_filename(image.filename)
                 standard_size = (125, 125)
-                pic = Image.open(image)
+                pic = Image.open(filename)
                 pic.thumbnail(standard_size)
-                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                
+                pic.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 profile_pic = str(filename)
 
             else:
