@@ -408,6 +408,7 @@ def customerMypage():
         updateAll('customers as a', update, cond)
 
         flash('Your Account Info Has Been Updated!', 'success')
+        return redirect(url_for('customerMypage'))
 
     image_file = url_for('static', filename='resources/' + profile_pic)
 
