@@ -7,7 +7,7 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main1.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
     {% block stylesheets %}
@@ -29,9 +29,18 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="/">Home</a>
               <a class="nav-item nav-link" href="/products">Products</a>
-              <a class="nav-item nav-link" href="/about">About</a>
+            </div>
+            <!-- Searchbar -->
+            <div class="navbar-nav mr-auto d-flex">
+              <div class="input-group mb-3 d-flex">
+                <form class="input-group" method="POST" action="{{ url_for('index') }}">
+                  <input type="text" class="form-control" style="max-width:100%; width: 350px;" name="searchword" placeholder="Search by product name or number">
+                  <div class="input-group-appendd d-flex">
+                    <button class="btn btn-primary" type="submit"><i class='fas fa-search' style='font-size:16px'></i></button>
+                  </div>
+                </form>
+              </div>
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
@@ -41,24 +50,24 @@
                 <div class="dropdown-content">
                   {% if session.userid == 1891: %}
                   {# ADMIN DROPDOWN#}
-                  <a href="/admin/orders">Orders</a>
-                  <a href="/admin/products">Products</a>
-                  <a href="/admin/customers">Customers</a>
+                  <a href="{{ url_for('admin_orders') }}">Orders</a>
+                  <a href="{{ url_for('admin_products') }}">Products</a>
+                  <a href="{{ url_for('admin_customers') }}">Customers</a>
                   {% else:%}
-                  <a href="/cart">Cart</a>
-                  <a href="#">Orders</a>
-                  <a href="/customerMypage">My page</a>
+                  <a href="{{ url_for('cart') }}">Cart</a>
+                  <a href="{{ url_for('orders') }}">Orders</a>
+                  <a href="{{ url_for('customerMypage')}}">My page</a>
                   {% endif %}
-                  <a href="/logout">Logout</a>
+                  <a href="{{ url_for('logout') }}">Logout</a>
                 </div>
               </div>
               {# note: this is out-commented
-              <a class="nav-item nav-link" href="/cart">Cart</a>
+              <a class="nav-item nav-link" href="{{ url_for('cart') }}">Cart</a>
               <a class="nav-item nav-link" href="{{ url_for('logout')}}">Logout</a>
               #}
               {% else: %}
               <a class="nav-item nav-link" href="{{ url_for('login')}}">Login</a>
-              <a class="nav-item nav-link" href="/register">Register</a>
+              <a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>
               {% endif %}
             </div>
           </div>

@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/orders.css') }}">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous"></head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+{% endblock%}
+
+{% block content %}
+<div class="header">My orders</div>
+<div class="cartcontainer">
+    <div class="titlerow" style="font-size: 10pt; font-weight: bold;">
+        <div class="col1">ORDER NO.</div>
+        <div class="col2">DATE</div>
+        <div class="col3">ORDER AMOUNT (SEK)</div>
+        <div class="col3">ORDER STATUS</div>
+    </div>
+    {% if orders:%}
+    {% for order in orders: %}
+    <div class="{{loop.cycle('itemrows', 'itemrows altrows')}}">
+        <div class="col1">{{order.0}}</div>
+        <div class="col2">{{order.1}}</div>
+        <div class="col3">{{ order.2 }}</div>
+        <div class="col3">{{ order.3 }}</div>
+        {% if request.args.get('display') == 'orderdetails' and request.args.get('order') == '%s' %(order.0) %}
+        <div class="col3"><a href="{{ url_for('orders') }}" title="close view"><i class='fas fa-angle-up' style='font-size:16px'></i></a></div>
+        <div class="col5" style="border: 1px solid black;">
+            <div class="titlerow" style="font-size:10pt; font-weight: bold;">
+                <div class="col1">ITEM NO.</div>
+                <div class="col1">QTY. (PCS)</div>
+                <div class="col1">UNIT PRICE (SEK)</div>
+                <div class="co1">AMOUNT (SEK)</div>
+            </div>
+            {% for row in rows %}
+            <div class="itemrows">
+                <div class="col1">{{ row.3 }}</div>
+                <div class="col1">{{ row.4 }} PCS</div>
+                <div class="col1">{{ row.5 }}</div>
+                <div class="col1">{{ row.4*row.5 }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="col3"><a href="{{ url_for('orders') }}?display=orderdetails&order={{ order.0 }}" title="view order"><i class='fas fa-angle-down' style='font-size:16px'></i></a></div>
+        {% endif %}
+    </div>
+    {% endfor %}
+    {% else: %}
+    <p>You have no orders.</p>
+    {% endif %}
+</div>
+<div class="footer">
+    <div style="font-weight: bold;">Total purchased amount: {{ totalamount.0 }} SEK</div>
+</div>
+{% endblock %}

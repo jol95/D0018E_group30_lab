@@ -1,4 +1,13 @@
-
 input.hidden {
     display: none;
+}
+
+.img {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+}
+
+.white {
+    background-color: #ffffff;
 }
