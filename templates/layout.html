@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 
 <head>
@@ -56,7 +56,7 @@
                   {% else:%}
                   <a href="{{ url_for('cart') }}">Cart</a>
                   <a href="{{ url_for('orders') }}">Orders</a>
-                  <a href="#">My page</a>
+                  <a href="{{ url_for('customerMypage')}}">My page</a>
                   {% endif %}
                   <a href="{{ url_for('logout') }}">Logout</a>
                 </div>
@@ -74,7 +74,7 @@
         </div>
       </nav>
     </header>
-
+    
     <main role="main" class="container">
       <div class="row">
         <div class="col-md-12">
