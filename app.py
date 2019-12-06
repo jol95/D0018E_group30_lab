@@ -407,6 +407,7 @@ def customerMypage():
 	print profile_pic
 	print email
 	print hashed_password
+	print cond
 
         updateAll('customers as a', update, cond)
 
