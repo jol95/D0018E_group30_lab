@@ -402,19 +402,14 @@ def customerMypage():
         pcode = str(form.post_code.data)
         country = form.country.data
         phone = str(form.phone_number.data)
-        update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.address="%s", a.postcode="%s", a.country="%s", a.profilepic="%s"' %(fname, lname, email, addr, pcode, country, profile_pic)
+        update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.password="%s",a.address="%s", a.postcode="%s", a.country="%s",a.phoneno="%s", a.profilepic="%s"' %(fname, lname, email, hashed_password, addr, pcode, country, phone, profile_pic)
         cond = 'custID = %s' %(str(request.args.get('custid')))
-        print fname
-        print email
-        print addr
-        print profile_pic
-        print hashed_password
+
         updateAll('customers as a', update, cond)
 
         flash('Your Account Info Has Been Updated!', 'success')
         #return redirect(url_for('customerMypage'))
 
-    print "adding image"
     image_file = url_for('static', filename='resources/' + profile_pic)
 
     return render_template('customerMypage.html', image_file=image_file, form=form, data=data)
