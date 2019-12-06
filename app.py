@@ -387,11 +387,7 @@ def customerMypage():
             image = form.picture.data
             if allowed_image(image.filename):
                 filename = secure_filename(image.filename)
-                standard_size = (125, 125)
-                pic = Image.open(filename)
-                pic.thumbnail(standard_size)
-                
-                pic.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 profile_pic = str(filename)
 
             else:
