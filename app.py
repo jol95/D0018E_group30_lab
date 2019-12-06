@@ -404,6 +404,9 @@ def customerMypage():
         phone = str(form.phone_number.data)
         update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.password="%s",a.address="%s", a.postcode="%s", a.country="%s",a.phoneno="%s", a.profilepic="%s"' %(fname, lname, email, hashed_password, addr, pcode, country, phone, profile_pic)
         cond = 'custID = %s' %(str(request.args.get('custid')))
+	print profile_pic
+	print email
+	print hashed_password
 
         updateAll('customers as a', update, cond)
 
