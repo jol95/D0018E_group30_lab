@@ -399,7 +399,6 @@ def admin_products_edit():
 
     # initalize edit form
     editform = adminProdEdit()
-    # return str(request.args.get('id'))
     res = getRow('products', 'prodID ='+prodid)
 
     # update the product
@@ -492,13 +491,91 @@ def admin_products_delete():
     return redirect(url_for('admin_products'))
 
 ## ADMIN - ORDER PAGES ##
-@app.route('/admin/orders')
+@app.route('/admin/orders', methods=['POST', 'GET'])
 def admin_orders():
     # denies access to admin pages if not admin
     if 'userid' not in session or session['userid'] != 1891:
         flash('Permission denied!', 'danger')
         return redirect('/')
-    return render_template('admin/orders.html')
+    
+    currentFilter = request.args.get('filter')
+
+    # order filter
+    orderFilters = {
+        'all': 'SELECT * FROM admin_orders',
+        'new': 'SELECT * FROM admin_orders WHERE statuscode=0',
+        'confirmed': 'SELECT * FROM admin_orders WHERE statuscode=1',
+        'delivered': 'SELECT * FROM admin_orders WHERE statuscode=2'
+        }
+
+    # show all orders if no filter
+    if request.args.get('filter'):
+        queary = orderFilters.get(request.args.get('filter'))
+    else:
+        queary = orderFilters.get('new')
+
+    orders = fetchall(queary)
+
+    # show selected order
+    orderln = ''
+    if request.args.get('show') == 'order':
+        ordno = request.args.get('ordno')
+        orders = fetchone('SELECT * FROM admin_orders WHERE orderno={}'.format(ordno))
+        orderln = fetchall('SELECT p.img, o.prodID, p.name, o.qty, p.stock, o.confirmed_qty \
+            FROM orderln as o INNER JOIN products as p ON o.prodID = p.prodID \
+            WHERE o.orderID={}'.format(ordno))
+
+    # search order
+    searchform = adminProdSearch()
+    if request.method == 'POST' and request.args.get('action') == 'search':
+        # check if more than one search word
+        sw = request.form.get('sw').split(' ')
+        print(len(sw))
+        for w in sw:
+            orders = fetchall('SELECT * FROM admin_orders WHERE orderno LIKE "%{0}%" OR custno LIKE "%{0}%" \
+            OR fname LIKE "%{0}%" or lname LIKE "%{0}%"'.format(w))
+
+    # confirming order
+    if request.method=='POST' and request.args.get('action') == 'confirmorder':
+        ordno = request.args.get('ordno')
+        for post in request.form:
+            item = post
+            confirm_qty = request.form.get(post)
+            # confirm qty. for each item
+            commit('UPDATE orderln SET confirmed_qty={} WHERE orderID={} AND \
+                    prodID={}'.format(confirm_qty, ordno, item))
+            
+            # update the stck for each item
+            commit('UPDATE products SET stock=stock-{} WHERE prodID={}'.format(confirm_qty, item))
+
+            # change orderstatus to "confirmed"
+            commit('UPDATE orders SET status=1 WHERE orderID={}'.format(ordno))
+        flash('Order {} is confirmed.'.format(ordno), 'success')
+        return redirect(url_for('admin_orders', filter=currentFilter))
+
+    # deliver order
+    if request.args.get('action') == 'delivered':
+        # get the latest invoice number
+        inv_no = fetchone('select invoiceno from orders order by invoiceno desc limit 1')[0]+1
+        ordno = request.args.get('ordno')
+        # change orderstatus to "delivered"
+        commit('UPDATE orders SET invoiceno={}, status=2 WHERE orderID={}'.format(inv_no, ordno))
+        flash('Order {} has been delivered.'.format(ordno), 'success')
+        return redirect(url_for('admin_orders', filter=currentFilter))
+
+    return render_template('admin/orders.html', orders=orders, orderln=orderln, 
+    currFilter=currentFilter, form=searchform)
+
+## DATE FORMAT FUNCTION ##
+@app.template_filter()
+def dateFormat(data):
+    # value = '{:.10}'.format(str(data))
+    return '{:.16}'.format(str(data))
+
+## CURRENCY FORMAT FUNCTION ##
+@app.template_filter()
+def currencyFormat(value):
+    return '{:,.2f} SEK'.format(float(value))
 
 
 

@@ -1,0 +1,87 @@
+/* TABLE HEAD */
+.header {
+    float: left;
+    font-size: 24pt;
+    text-transform: capitalize;
+}
+
+.table {
+    width: 100%;
+}
+
+.titlerow {
+    float: left;
+    padding 5px;
+    width: 100%;
+    font: 11px, bold;
+    border-bottom: 1px solid black;
+}
+
+.titlerow > div {
+    float: left;
+}
+
+/* ITEM ROWS */
+.itemrows {
+    float: left;
+    display: box;
+    width: 100%;
+}
+
+.altrows {
+    background-color: #d8d8d8;
+}
+
+.itemrows > div {
+    float: left;
+    padding: 5px;
+}
+
+.col1 {
+    width: 100px;
+    margin: 0px;
+}
+
+.col2 {
+    width: 200px;
+    margin: 0px;
+}
+
+.col3 {
+    width: 300px;
+}
+
+input.hidden {
+    display: none;
+}
+
+/* MENU */
+.menu {
+    float: left;
+    width: 100%;
+    background: none;
+}
+
+.menu > div {
+    display: block;
+    padding: 10px;
+    float: left;
+}
+
+ul.menu-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.menu-list > li {
+    float: left;
+    padding-right: 20px;
+}
+
+.menu-list > a:hover{
+    display: block;
+    background-color: blue;
+}
+input.searchbar {
+    width: 400px;
+}

@@ -32,8 +32,9 @@
         <div class="col2">NAME</div>
         <div class="col3">IN STOCK</div>
     </div>
+    {% if prod %}
     {% for items in prod: %}
-    <div class="{{loop.cycle('itemrows', 'itemrows altrows')}}">
+    <div class="{{loop.cycle('itemrows', 'itemrows altrows rounded')}}">
         <div class="col1">{{ items.0 }}</div>
         <div class="col2">{{ items.1 }}</div>
         <div class="col3">{{ items.5 }} PCS</div>
@@ -42,6 +43,7 @@
         </div>
     </div>
     {% endfor %}
+    {% endif %}
 </div>
 {% elif p == 'edit' %}
 {# PRODUCT EDIT PAGE #}
@@ -130,9 +132,9 @@
             {{form.cat.label}}
             {{form.cat(class='form-control mb-2 mr-sm-2')}}
         </div>
-        <div class="itemrows custom-file">
-            {{form.img.label(class='custom-file-label')}}:
-            {{ form.img(class='form-control mb-2 mr-sm-2, custom-file-input') }}
+        <div class="itemrows">
+            {{form.img.label()}}:
+            {{ form.img(class='form-control mb-2 mr-sm-2') }}
         </div>
         <div class="itemrows" style="padding-top: 5px;">
             {{form.submit(class='btn btn-primary mb-2', value="Add product")}}

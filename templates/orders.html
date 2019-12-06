@@ -21,8 +21,8 @@
     {% if orders:%}
     {% for order in orders: %}
     <div class="{{loop.cycle('itemrows', 'itemrows altrows')}}">
-        <div class="col1">{{order.0}}</div>
-        <div class="col2">{{order.1}}</div>
+        <div class="col1">{{ order.0 }}</div>
+        <div class="col2">{{ order.1 }}</div>
         <div class="col3">{{ order.2 }}</div>
         <div class="col3">{{ order.3 }}</div>
         {% if request.args.get('display') == 'orderdetails' and request.args.get('order') == '%s' %(order.0) %}
