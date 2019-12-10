@@ -624,8 +624,9 @@ def customerMypage():
             image = form.picture.data
             if allowed_image(image.filename):
                 filename = upload_file(image)
-                #filename = secure_filename(image.filename)
-                #image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                if profile_pic != 'default.jpg':
+                    os.remove('static/resources/' + profile_pic)
+
                 profile_pic = str(filename)
 
             else:
