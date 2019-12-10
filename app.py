@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from PIL import Image
 from werkzeug.utils import secure_filename
+import secrets
 
 from SQLfunctions import *
 from forms import *
@@ -19,7 +20,7 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'Choss!95'
 app.config['MYSQL_DB'] = 'webshop'
 
-app.config['UPLOAD_FOLDER'] = '/var/www/html/static/resources'
+app.config['UPLOAD_FOLDER'] = 'static/resources'
 app.config['ALLOWED_IMAGE_EXTENSIONS'] = ["JPG", "PNG"]
 
 
@@ -591,11 +592,10 @@ def allowed_image(filename):
 
 
 def upload_file(pic_filename):
-    #hex_rand = secrets.token_hex(8)
-    #picture_fn = secure_filename(pic_filename.filename)
-    #_, f_ext = os.path.splittext(pic_filename.filename)
-    #picture_fn =  + f_ext
-    picture_path = os.path.join(app.config['UPLOAD_FOLDER'], pic_filename)
+    hex_rand = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(pic_filename.filename)
+    picture_fn = hex_rand + f_ext
+    picture_path = os.path.join(app.config['UPLOAD_FOLDER'], picture_fn)
 
     standard_size = (125, 125)
     pic = Image.open(pic_filename)
@@ -623,8 +623,9 @@ def customerMypage():
         if form.picture.data:
             image = form.picture.data
             if allowed_image(image.filename):
-                filename = secure_filename(image.filename)
-                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                filename = upload_file(image)
+                #filename = secure_filename(image.filename)
+                #image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 profile_pic = str(filename)
 
             else:
