@@ -8,7 +8,7 @@ from PIL import Image
 from werkzeug.utils import secure_filename
 import secrets
 from itsdangerous import URLSafeTimedSerializer as Serializer
-from flask_mail import Message
+from flask_mail import Message, Mail
 from threading import Thread
 
 from SQLfunctions import *
