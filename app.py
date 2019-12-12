@@ -706,7 +706,7 @@ def request_reset():
     form = resetRequestform()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM customers WHERE email = %s', [email])
+        cur.execute('SELECT * FROM customers WHERE email = %s', [form.email.data])
         data = cur.fetchone()
 
         if len(data) > 0:
