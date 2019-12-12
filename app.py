@@ -28,6 +28,12 @@ app.config['ALLOWED_IMAGE_EXTENSIONS'] = ["JPG", "PNG"]
 
 
 mysql = MySQL(app)
+
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'simonpontinltu@gmail.com'
+app.config['MAIL_PASSWORD'] = 'Simonpontin123@'
 mail = Mail(app)
 
 ## REGISTER PAGE ##
@@ -678,8 +684,8 @@ def send_async_email(msg):
         mail.send(msg)
 
 
-def send_email(subject, reciever, html_url):
-    msg = Message(subject, reciever=reciever)
+def send_email(subject, recipients, html_url):
+    msg = Message(subject, sender='noreply@demo.com', recipients=recipients)
     msg.html = html_url
     thr = Thread(target=send_async_email, args=[msg])
     thr.start()
