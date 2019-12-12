@@ -685,7 +685,7 @@ def send_async_email(msg):
 
 
 def send_email(subject, recipients, html_url):
-    msg = Message(subject, sender='noreply@demo.com', recipients=recipients)
+    msg = Message(subject, recipients=recipients)
     msg.html = html_url
     thr = Thread(target=send_async_email, args=[msg])
     thr.start()
