@@ -8,7 +8,7 @@
 <div class="header">My shopping cart</div>
 <div class="cartcontainer">
     <div class="titlerow">
-        <div class="col1">ITEM NUMBER</div>
+        <div class="col1">ITEM</div>
         <div class="col2">NAME</div>
         <div class="col3">UNIT PRICE (SEK)</div>
         <div class="col3">QUANTITY (PCS)</div>
@@ -17,10 +17,17 @@
         <p>The shopping cart is empty.</p>
     {% endif %}
     {% for items in cart: %}
-    <div class="{{loop.cycle('itemrows', 'itemrows altrows')}}">
-        <div class="col1">{{items.0}}</div>
-        <div class="col2">{{items.1}}</div>
-        <div class="col3">{{items.2}}</div>
+    <div class="{{loop.cycle('itemrows', 'itemrows altrows rounded')}}">
+        <div class="col1">
+            <img src="{{ url_for('static', filename='resources/') }}{{items.5}}" class="rounded" width="80" height="80"/>
+        </div>
+        <div class="col2">
+            <a href="{{url_for('product', id=items.0, qty=1)}}">{{items.1}}</a></br>
+            #{{items.0}}
+        </div>
+        <div class="col3">
+            {{items.2*((100-items.4)/100)}}
+        </div>
         <div class="col3">
             <form action="{{ url_for('updatecart') }}?action=update" method="POST">
                 <input name="qty" value="{{items.3}}" class="col3" type="text">
@@ -29,7 +36,7 @@
                 <input type="submit" value="Update" class="btn btn-secondary btn-sm">
             </form>
         </div>
-        <div class="col3"><a href="{{ url_for('updatecart') }}?action=delete&id={{ items.0 }}" class="btn btn-danger btn-sm" title="delete">X</a></div>
+        <div class=""><a href="{{ url_for('updatecart') }}?action=delete&id={{ items.0 }}" class="btn btn-danger btn-sm" title="delete">X</a></div>
     </div>
     {% endfor %}
 </div>
@@ -46,7 +53,12 @@
     {% else: %}
     <div><a href="{{ url_for('cart')}}?confirm=checkout" class='btn btn-primary mb-2'>Checkout</a></div>
     <div><a href="{{ url_for('cart')}}?confirm=clearcart" class='btn btn-primary mb-2'>Clear</a></div>
-    <div>Total amount: {{totalamount}} SEK</div>
+    <div>
+        Total amount: {{totalamount | currencyFormat}}</br>
+        {% if totaldiscount > 0 %}
+        Total discount: {{totaldiscount | currencyFormat}}
+        {% endif %}
+    </div>
     {% endif %}
 </div>
 {% endblock %}

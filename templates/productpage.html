@@ -20,20 +20,18 @@
                 <h6>Description:</h6>
                 <p>{{ item.2 }}</p>
             </div>
-            <div class="p-2"><h4>{{ item.3 }} SEK</h4></div>
-            <div class="d-flex">
-                <form method="POST" action="{{ url_for('addtocart')}}?id={{item.0}}" class="d-flex">
-                    <select name="qty" class="custom-select">
-                        <option selected value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5+</option>
-                    </select>
-                    &nbsp;
-                    <button type="submit" class="btn btn-primary btn-sm">Buy</button>
-                </form>
+            <div class="p-2">
+                {% if item.7 > 0 %}
+                <span class="badge badge-pill badge-danger">{{ item.7}}% discount of {{ item.3 | currencyFormat}}</span>          
+                {% endif %}
+                <h4>{{ item.3*((100-item.7)/100)}} SEK</h4>
             </div>
+            <div class="d-flex">
+                <a href="{{url_for('product', id=item.0, qty=request.args.get('qty'), action='decqty')}}">-</a>
+                <div class="form-control form-control-sm" style="font-size:16px; width: auto; margin-left: 5px; margin-right: 5px;">{{request.args.get('qty')}}</div>
+                <a href="{{url_for('product', id=item.0, qty=request.args.get('qty'), action='incqty')}}">+</a>
+            </div>
+            <div class="d-flex"><a href="{{url_for('addtocart', id=item.0, qty=request.args.get('qty'))}}" class="btn btn-primary m-2">Add to cart</a></div>
             {% if 'userid' in session %}
             <div class="d-flex">
                 <a href="#writereview">Review this product</a>
