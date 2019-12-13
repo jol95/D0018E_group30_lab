@@ -32,8 +32,8 @@ mysql = MySQL(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'simonpontinltu@gmail.com'
-app.config['MAIL_PASSWORD'] = 'Simonpontin123@'
+app.config['MAIL_USERNAME'] = 'gr30adm@gmail.com'
+app.config['MAIL_PASSWORD'] = 'Choss!95'
 mail = Mail(app)
 
 ## REGISTER PAGE ##
@@ -146,7 +146,7 @@ def product():
     args = request.args
     item = getRow('products', 'prodID='+args.get("id"))
     ## GET REVIEWS ##
-    attr = 'customers.firstname, reviews.date, reviews.text, reviews.stars'
+    attr = 'customers.firstname, reviews.date, reviews.text, reviews.stars, customers.profilepic'
     join = 'customers ON reviews.custID = customers.custID'
     cond = 'reviews.prodID=%s' %(item[0])
     rev = innerJoin('reviews', attr, join, cond)
@@ -702,7 +702,7 @@ def admin_orders():
         ordno = request.args.get('ordno')
         # change orderstatus to "delivered"
         commit('UPDATE orders SET invoiceno={}, status=2 WHERE orderID={}'.format(inv_no, ordno))
-        flash('Order {} has been delivered.'.format(ordno), 'success')
+        flash('Order {} has been shipped.'.format(ordno), 'success')
         return redirect(url_for('admin_orders', filter=currentFilter))
     
     # delete order
@@ -831,7 +831,7 @@ def send_async_email(msg):
 
 
 def send_email(subject, recipients, html_url):
-    msg = Message(subject, recipients=recipients)
+    msg = Message(subject, recipients=recipients, sender='cpangdee@gmail.com')
     msg.html = html_url
     thr = Thread(target=send_async_email, args=[msg])
     thr.start()
@@ -878,13 +878,13 @@ def reset_password_with_token(token):
     form = resetPasswordform()
     if form.validate_on_submit():
         cur = mysql.connection.cursor()
-        cur.execute('SELECT * FROM customers WHERE email = %s', [email])
+        cur.execute('SELECT * FROM customers WHERE email = "{}"'.format(email))
         data = cur.fetchone()
 
         if len(data) > 0:
             hashed_password = generate_password_hash(form.password.data)
-            update = a.password="%s" % ([hashed_password])
-            cond = 'email = %s' % ([email])
+            update = 'a.password="{}"'.format(hashed_password)
+            cond = 'email = "{}"'.format(email)
 
             updateAll('customers as a', update, cond)
             flash('Your password has been updated!', 'success')
@@ -894,7 +894,7 @@ def reset_password_with_token(token):
             flash('Invalid email address!', 'danger')
             return redirect(url_for('login'))
 
-    return render_template('reset_password_with_token.html', form=form, token=token)
+    return render_template('rest_password_with_token.html', form=form, token=token)
 
 
 if __name__ == "__main__":
