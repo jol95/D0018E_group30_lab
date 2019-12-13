@@ -715,7 +715,7 @@ def get_reset_token(id, expire_time):
 
 
 def send_reset_email(user, email):
-    token = user.get_reset_token(user, 300)
+    token = get_reset_token(user, 300)
     msg = Message('Password Reset Request',
                   sender='noreply@demo.com',
                   recipients=[email])
