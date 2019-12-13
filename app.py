@@ -29,6 +29,7 @@ app.config['ALLOWED_IMAGE_EXTENSIONS'] = ["JPG", "PNG"]
 
 mysql = MySQL(app)
 
+
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -680,8 +681,8 @@ def verify_token_reset(token):
 
 
 def send_async_email(msg):
-    with app.app_context():
-        mail.send(msg)
+    with mail.connect() as conn:
+        conn.send(msg)
 
 
 def send_email(subject, recipients, html_url):
