@@ -665,7 +665,6 @@ def customerMypage():
 
 
 
-
 def send_async_email(msg):
     with app.app_context():
         mail.send(msg)
@@ -688,46 +687,7 @@ def send_password_reset_email(user_email):
     send_email('Password Reset Requested', [user_email], template)
 
 
-@staticmethod
-def verify_token_reset(token):
-    s = Serializer(app.config['SECRET_KEY'])
-    try:
-        user_id = s.loads(token)['userid']
-    except:
-        return None
-
-    cur = mysql.connection.cursor()
-    cur.execute('SELECT * FROM customers WHERE custID = %s', [user_id])
-    data = cur.fetchone()
-
-    if len(data) > 0:
-        userid = data[0]
-        return userid
-
-    else:
-        return None
-
-
-
-def get_reset_token(id, expire_time):
-    s = Serializer(app.config['SECRET_KEY'], expire_time)
-    return s.dumps({'userid': id}).decode('utf-8')
-
-
-def send_reset_email(user, email):
-    token = get_reset_token(user, 300)
-    msg = Message('Password Reset Request',
-                  sender='noreply@demo.com',
-                  recipients=[email])
-    msg.body = f'''To reset your password, visit the following link:
-{url_for('reset_password_with_token', token=token, _external=True)}
-If you did not make this request then simply ignore this email and no changes will be made.
-'''
-    mail.send(msg)
-
-
-
-@app.route("/reset_password", methods=['GET', 'POST'])
+@app.route("/reset", methods=['GET', 'POST'])
 def request_reset():
     form = resetRequestform()
     if form.validate_on_submit():
@@ -736,11 +696,8 @@ def request_reset():
         data = cur.fetchone()
 
         if len(data) > 0:
-            user = data[0]
-            email = data[1]
-            send_reset_email(user, email)
+            send_password_reset_email(form.email.data)
             flash('A Password Reset Link Has Been Sent To Youre Email', 'success')
-            return redirect(url_for('login'))
 
         else:
             flash('Invalid Email Address!', 'danger')
@@ -749,24 +706,33 @@ def request_reset():
 
 
 
-
-@app.route("/reset_password<token>", methods=['GET', 'POST'])
+@app.route("/reset/<token>", methods=['GET', 'POST'])
 def reset_password_with_token(token):
-    user = verify_token_reset(token)
-    if user is None:
-        flash('That is an invalid or expired token', 'warning')
+    try:
+        password_reset_serializer = Serializer(app.config['SECRET_KEY'])
+        email = password_reset_serializer.loads(token, salt='password-reset-salt', max_age=3600)
+    except:
+        flash('The Password Reset Link Has Expired.', 'error')
         return redirect(url_for('login'))
 
     form = resetPasswordform()
     if form.validate_on_submit():
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT * FROM customers WHERE email = %s', [email])
+        data = cur.fetchone()
 
-        hashed_password = generate_password_hash(form.password.data)
-        update = a.password="%s" % ([hashed_password])
-        cond = 'custID = %s' % ([user])
+        if len(data) > 0:
+            hashed_password = generate_password_hash(form.password.data)
+            update = a.password="%s" % ([hashed_password])
+            cond = 'email = %s' % ([email])
 
-        updateAll('customers as a', update, cond)
-        flash('Your password has been updated!', 'success')
-        return redirect(url_for('login'))
+            updateAll('customers as a', update, cond)
+            flash('Your password has been updated!', 'success')
+            return redirect(url_for('login'))
+
+        else:
+            flash('Invalid email address!', 'danger')
+            return redirect(url_for('login'))
 
     return render_template('reset_password_with_token.html', form=form, token=token)
 
