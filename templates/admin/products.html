@@ -2,6 +2,9 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin/products.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -9,7 +12,7 @@
 {% if p == 'products' %}
 {# PRODUCT LIST PAGE #}
 <div class="menu">
-    <form method="POST" action="{{ url_for('admin_products')}}" class="menu">
+    <form method="POST" action="{{ url_for('admin_products', action='search')}}" class="menu">
         <div>
             {{form.search(class='searchbar', placeholder='Search by item number or product name')}}
         </div>
@@ -21,7 +24,7 @@
         <ul class="menu-list">
             <li><a href="{{ url_for('admin_products') }}" class="btn btn-primary mb-2">Show all products</a></li>
             <li><a href="{{ url_for('admin_products_add') }}" class="btn btn-primary mb-2">Add new product</a></li>
-            <li><a href="#" class="btn btn-primary mb-2">Add/edit category</a></li>
+            <li><a href="javascript: void(0);" class="btn btn-primary mb-2" data-toggle="modal" data-target="#myModal">Add/edit category</a></li>
         </ul>
         
     </div>
@@ -30,21 +33,59 @@
     <div class="titlerow">
         <div class="col1">ITEM NUMBER</div>
         <div class="col2">NAME</div>
-        <div class="col3">IN STOCK</div>
+        <div class="col3">IN STOCK (PCS)</div>
+        <div class="col3">IN ORDER (PCS)</div>
+        <div class="col3">SOLD (PCS)</div>
     </div>
     {% if prod %}
     {% for items in prod: %}
     <div class="{{loop.cycle('itemrows', 'itemrows altrows rounded')}}">
-        <div class="col1">{{ items.0 }}</div>
+        <div class="col1"><a href="{{ url_for('admin_products_edit') }}?id={{ items.0}}">{{ items.0 }}</a></div>
         <div class="col2">{{ items.1 }}</div>
-        <div class="col3">{{ items.5 }} PCS</div>
-        <div class="col3">
-            <a href="{{ url_for('admin_products_edit') }}?id={{ items.0}}">Edit</a>
-        </div>
+        <div class="col3">{{ items.5 }}</div>
+        <div class="col3">{{ items.8 }}</div>
+        <div class="col3">{{ items.9 }}</div>
     </div>
     {% endfor %}
     {% endif %}
 </div>
+
+<!-- The Modal -->
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+    
+        <!-- Modal Header -->
+        <div class="modal-header">
+            <h4 class="modal-title">Product categories</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+    
+        <!-- Modal body -->
+        <div class="modal-body">
+            {% for cat in cats %}
+            <div class="{{loop.cycle('itemrows', 'itemrows altrows rounded')}}">
+                <div class="col1" style="text-transform: capitalize;">{{ cat.1 }}</div>
+                <div class="col3">
+                    <a href="{{url_for('admin_products', action='deletecat', cat=cat.1)}}" class="btn btn-danger btn-sm">Delete</a>
+                </div>
+            </div>
+            {% endfor %}
+            <form action="{{url_for('admin_products', action='addnewcat')}}" method="POST">
+                <input type="text" name="newcat" class="form-control" placeholder="Create new category">
+                <button type="submit" class="btn btn-primary btn-sm m-2">Add</button>
+            </form>
+        </div>
+    
+        <!-- Modal footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    
+        </div>
+    </div>
+</div>
+
 {% elif p == 'edit' %}
 {# PRODUCT EDIT PAGE #}
 <div class="table d-flex">
@@ -53,7 +94,14 @@
                 <img src="{{ url_for('static', filename='resources/') }}{{ item.4 }}" alt="{{item.4}}" class="rounded" width="100" height="100"/>
         </div>
         <div class="d-flex flex-column p-2">
-            <div class="d-flex">Item#: {{ item.0 }}</div>
+            <div class="d-flex">
+                Item#: {{ item.0 }}
+                {% if item.10 == 0 %}
+                <span class="badge badge-success ml-2">Active</span>
+                {% else %}
+                <span class="badge badge-danger ml-2">Inactive</span>
+                {% endif %}
+            </div>
             <div class="d-flex">Product: {{ item.1 }}</div>
             <div>
                 <a href="{{ url_for('admin_products_edit') }}?id={{item.0}}&changeimg=true" class="badge badge-primary">Change picture</a>
@@ -101,8 +149,15 @@
         </div>
         <div class="itemrows" style="border-top: 1px solid black; margin-top: 10px; padding-top: 5px;">
             {{form.submit(class='btn btn-primary mb-2')}}
+            {#  DELETE PRODUCT OPTION INACTIVE 
             <a href="{{ url_for('admin_products_edit') }}?id={{ item.0}}&confirm=delete" class="btn btn-primary mb-2">Delete</a>
-            <a href="{{ url_for('admin_products' )}}" class="btn btn-primary mb-2">Cancel</a>
+            #}
+            {% if item.10 == 0 %}
+            <a href="{{ url_for('admin_products_status', action='set', status='deactivate', id=item.0)}}" class="btn btn-danger mb-2">Inactivate</a>
+            {% else %}
+            <a href="{{ url_for('admin_products_status', action='set', status='activate', id=item.0)}}" class="btn btn-success mb-2">Activate</a>
+            {% endif %}
+            <a href="javascript: history.go(-1);" class="btn btn-secondary mb-2">Cancel</a>
             {% endif %}
         </div>
     </form>
@@ -138,7 +193,7 @@
         </div>
         <div class="itemrows" style="padding-top: 5px;">
             {{form.submit(class='btn btn-primary mb-2', value="Add product")}}
-            <a href="{{ url_for('admin_products' )}}" class="btn btn-primary mb-2">Cancel</a>
+            <a href="javascript: history.go(-1);" class="btn btn-secondary mb-2">Cancel</a>
         </div>
     </form>
 </div>

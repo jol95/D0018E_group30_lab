@@ -9,16 +9,43 @@
     {% for items in prod %}
     <div class="col">
         <div class="card" style="width:250px; height: 450px; float: left; margin: 5px;">
-            <a href="{{url_for('product')}}?id={{items.0}}">
+            <a href="{{url_for('product', id=items.0, qty=1)}}">
             <img class="card-img-top" src="{{ url_for('static', filename='resources/') }}{{ items.4 }}" alt="{{ items.4 }}" style="width:100%">
             </a>
             <div class="card-body">
-                <h4 class="card-title"><a href="{{url_for('product')}}?id={{items.0}}">{{ items.1 }}</a></h4>
-                <p class="card-text">{{ items.3 }} SEK</p>
+                <h4 class="card-title"><a href="{{url_for('product', id=items.0, qty=1)}}">{{ items.1 }}</a></h4>
+                {% if items.7 > 0 %}
+                <span class="badge badge-pill badge-danger">{{ items.7}}% discount of {{ items.3 | currencyFormat}}</span>          
+                {% endif %}
+                <p class="card-text">{{ items.3*((100-items.7)/100) }} SEK</p>
                 <a href="{{ url_for('addtocart')}}?id={{items.0}}&qty=1" class="btn btn-primary">Buy</a>
             </div>
         </div>
     </div>
     {% endfor %}
 </div>
+{% if noOfPages > 0 %}
+<div class="container-fluid" style="float:left;">
+    <ul class="pagination justify-content-center">
+        {% if poffset == 0 %}
+        <li class="page-item disabled"><a class="page-link" href="{{ url_for('index', action='previous, offset=poffset', cat=currcat) }}">Previous</a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('index', action='previous', offset=poffset, cat=currcat) }}">Previous</a></li>
+        {% endif %}
+        {% for i in range(1, noOfPages+1)  %}
+        {% if (i-1)*plimit == poffset %}
+        <li class="page-item active"><a class="page-link" href="{{ url_for('index', action='goto', page=i-1, offset=poffset, cat=currcat) }}">{{i}}</a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('index', action='goto', page=i-1, offset=poffset, cat=currcat) }}">{{i}}</a></li>
+        {% endif %}
+        {% endfor %}
+        {% if poffset == noOfPages*plimit-plimit %}
+        <li class="page-item disabled"><a class="page-link" href="{{ url_for('index', action='next', offset=poffset, cat=currcat) }}">Next</a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('index', action='next', offset=poffset, cat=currcat) }}">Next</a></li>
+        {% endif %}
+    </ul>
+</div>
+{% endif %}
+
 {% endblock content %}

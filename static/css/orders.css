@@ -38,18 +38,17 @@
 }
 
 .col1 {
-    width: 150px;
+    width: 100px;
     margin: 0px;
 }
 
 .col2 {
-    width: 400px;
+    width: 200px;
     margin: 0px;
 }
 
 .col3 {
-    float: left;
-    width: 170px;
+    width: 300px;
 }
 
 .col5 {
@@ -80,4 +79,35 @@ input.hidden {
     display: block;
     padding: 10px;
     float: right;
+}
+
+/* MENU */
+.menu {
+    float: left;
+    width: 100%;
+    background: none;
+}
+
+.menu > div {
+    display: block;
+    padding: 10px;
+    float: left;
+}
+
+ul.menu-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.menu-list > li {
+    float: left;
+    padding-right: 20px;
+}
+
+.menu-list > a:hover{
+    display: block;
+    background-color: blue;
+}
+input.searchbar {
+    width: 400px;
 }

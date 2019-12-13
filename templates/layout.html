@@ -29,7 +29,15 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
-              <a class="nav-item nav-link" href="/products">Products</a>
+                <div class="dropdown">
+                    <button class="dropbtn" data-toggle="dropdown">Products</button>
+                    <div class="dropdown-content">
+                      {% for cat in cats %}
+                      <a href="{{ url_for('index', cat=cat.0 )}}" style="text-transform: capitalize;">{{cat.1}} {{cat.0 | catFilter}}</a>
+                      {% endfor %}
+
+                    </div>
+                  </div>
             </div>
             <!-- Searchbar -->
             <div class="navbar-nav mr-auto d-flex">
@@ -46,25 +54,22 @@
             <div class="navbar-nav">
               {% if 'userid' in session: %}
               <div class="dropdown">
-                <button class="dropbtn" data-toggle="dropdown">Welcome, {{ session['username'] }}!</button>
+                <button class="dropbtn" data-toggle="dropdown"><i class='fas fa-bars' style='font-size:24px'></i></button>
                 <div class="dropdown-content">
                   {% if session.userid == 1891: %}
                   {# ADMIN DROPDOWN#}
-                  <a href="{{ url_for('admin_orders') }}">Orders</a>
-                  <a href="{{ url_for('admin_products') }}">Products</a>
-                  <a href="{{ url_for('admin_customers') }}">Customers</a>
+                  <a href="{{ url_for('admin_orders') }}"><i class='fas fa-clipboard-list' style='font-size:24px'></i> Orders</a>
+                  <a href="{{ url_for('admin_products') }}"><i class='fas fa-boxes' style='font-size:24px'></i> Products</a>
+                  <a href="{{ url_for('admin_customers') }}"><i class='fas fa-users' style='font-size:24px'></i> Customers</a>
                   {% else:%}
-                  <a href="{{ url_for('cart') }}">Cart</a>
-                  <a href="{{ url_for('orders') }}">Orders</a>
-                  <a href="{{ url_for('customerMypage')}}">My page</a>
+                  <a href="{{ url_for('cart') }}"><i class='fas fa-shopping-cart' style='font-size:24px'></i> Cart</a>
+                  <a href="{{ url_for('orders') }}"><i class='fas fa-clipboard-list' style='font-size:24px'></i> Orders</a>
+                  <a href="{{ url_for('customerMypage')}}"><i class='fas fa-user' style='font-size:24px'></i> My page</a>
                   {% endif %}
-                  <a href="{{ url_for('logout') }}">Logout</a>
+                  <a href="{{ url_for('logout') }}"><i class='fas fa-key' style='font-size:24px'></i> Logout</a>
                 </div>
               </div>
-              {# note: this is out-commented
-              <a class="nav-item nav-link" href="{{ url_for('cart') }}">Cart</a>
-              <a class="nav-item nav-link" href="{{ url_for('logout')}}">Logout</a>
-              #}
+              <a class="nav-item nav-link" href="javascript:void(0);">Welcome, {{ session['username'] }}! </a>
               {% else: %}
               <a class="nav-item nav-link" href="{{ url_for('login')}}">Login</a>
               <a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>

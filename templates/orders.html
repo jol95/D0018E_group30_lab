@@ -11,48 +11,117 @@
 
 {% block content %}
 <div class="header">My orders</div>
-<div class="cartcontainer">
+<div class="menu">
+    <div>
+        <ul class="menu-list">
+            <li><a href="{{ url_for('orders', action='search', filter=currFilter) }}" class="btn btn-primary mb-2">Search order</a></li>
+            <li><a href="{{ url_for('orders', filter='new') }}" class="btn btn-primary mb-2">New orders</a></li>
+            <li><a href="{{ url_for('orders', filter='confirmed') }}" class="btn btn-primary mb-2">Confirmed orders</a></li>
+            <li><a href="{{ url_for('orders', filter='delivered') }}" class="btn btn-primary mb-2">Delivered orders</a></li>
+        </ul>
+    </div>
+</div>
+{% if request.args.get('action') == 'search' %}
+<form method="POST" action="{{url_for('orders', action='search', filter=currFilter)}}">
+<div class="input-group mb-3">
+    <div class="input-group-prepend">
+        <button class="btn btn-outline-primary" type="submit"><i class='fas fa-search' style='font-size:16px'></i></button>
+    </div>
+    <input type="text" class="form-control" name="sw" placeholder="Search by order no., customer no, or customer name">
+</div>
+</form>
+{% endif %}
+{% if request.args.get('show') == 'order' %}
+<!-- The Modal -->
+<div class="modal-dialog modal-xl">
+    <div class="modal-content">
+    
+    <!-- Modal Header -->
+    <div class="modal-header header">
+        <div class="d-flex flex-column">
+            <div class="d-flex">
+                <h4>Order: {{ orders.0 }}</h4></br>
+            </div>
+            <div class="d-flex">
+                <h6>Customer: {{ orders.2 }} {{ orders.3 }}</h6>
+            </div>
+            <div class="d-flex">
+                <h6>Order date: {{ orders.4 }}</h6>
+            </div>
+            <div class="d-felx">
+                <h6>Order status: {{ orders.7 }}</h6>
+            </div>
+        </div>
+        <div class="d-felx flex-column flex-auto">
+            <div class="d-flex"><h6>Order amount: {{ orders.5}}</h6></div>
+            <div class="d-flex"><h6>Number of items: {{ itemCount.0}}</h6></div>
+        </div>
+    </div>
+    
+    <!-- Modal body -->
+    <div class="modal-body">
+        <div class="table">
+            <div class="titlerow" style="font-size: 10pt; font-weight: bold;">
+                <div class="col2">Item</div>
+                <div class="col3">Name</div>
+                <div class="col1">Order qty.</div>
+                <div class="col1">Unit price</div>
+                <div class="col1">Discount</div>
+                <div class="col2">Confirmed qty.</div>
+            </div>
+            {% if orders:%}
+            {% for ln in orderln: %}
+            <div class="{{loop.cycle('itemrows', 'itemrows altrows rounded')}}">
+                <div class="col2">
+                    <img src="{{ url_for('static', filename='resources/') }}{{ln.0}}" class="rounded" width="100" height="100"/>
+                </div>
+                <div class="col3">
+                    <a href="{{ url_for('product', id=ln.1, qty=1)}}">{{ln.2}}</a></br>
+                    #{{ln.1}}
+                </div>
+                <div class="col1">{{ln.3}}</div>
+                <div class="col1">{{ln.4}}</div>
+                <div class="col1">{{ln.6}}%</div>
+                <div class="col1">{{ln.5}}</div>
+            </div>
+            {% endfor %}
+            {% else: %}
+            <div class="itemrows"><p>There are no {{ currFilter }}orders.</p></div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Modal footer -->
+    <div class="modal-footer">
+        {% if orders.6 == 0 %}
+        <a href="{{url_for('orders', action='deleteorder', ordno=orders.0, filter=currFilter)}}" class="btn btn-danger">Delete order</a>
+        {% endif %}
+        <a href="{{url_for('orders', filter=currFilter)}}" class="btn btn-secondary">Close</a>
+    </div>
+</div>
+{% else %}
+<div class="table">
     <div class="titlerow" style="font-size: 10pt; font-weight: bold;">
         <div class="col1">ORDER NO.</div>
         <div class="col2">DATE</div>
-        <div class="col3">ORDER AMOUNT (SEK)</div>
+        <div class="col3">ORDER AMOUNT</div>
         <div class="col3">ORDER STATUS</div>
     </div>
     {% if orders:%}
     {% for order in orders: %}
-    <div class="{{loop.cycle('itemrows', 'itemrows altrows')}}">
-        <div class="col1">{{ order.0 }}</div>
+    <div class="{{loop.cycle('itemrows', 'itemrows altrows rounded')}}">
+        <div class="col1"><a href="{{ url_for('orders', show='order', ordno=order.0, filter=currFilter)}}">{{ order.0 }}</a></div>
         <div class="col2">{{ order.1 }}</div>
-        <div class="col3">{{ order.2 }}</div>
+        <div class="col3">{{ order.2 | currencyFormat }}</div>
         <div class="col3">{{ order.3 }}</div>
-        {% if request.args.get('display') == 'orderdetails' and request.args.get('order') == '%s' %(order.0) %}
-        <div class="col3"><a href="{{ url_for('orders') }}" title="close view"><i class='fas fa-angle-up' style='font-size:16px'></i></a></div>
-        <div class="col5" style="border: 1px solid black;">
-            <div class="titlerow" style="font-size:10pt; font-weight: bold;">
-                <div class="col1">ITEM NO.</div>
-                <div class="col1">QTY. (PCS)</div>
-                <div class="col1">UNIT PRICE (SEK)</div>
-                <div class="co1">AMOUNT (SEK)</div>
-            </div>
-            {% for row in rows %}
-            <div class="itemrows">
-                <div class="col1">{{ row.3 }}</div>
-                <div class="col1">{{ row.4 }} PCS</div>
-                <div class="col1">{{ row.5 }}</div>
-                <div class="col1">{{ row.4*row.5 }}</div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="col3"><a href="{{ url_for('orders') }}?display=orderdetails&order={{ order.0 }}" title="view order"><i class='fas fa-angle-down' style='font-size:16px'></i></a></div>
-        {% endif %}
     </div>
     {% endfor %}
     {% else: %}
-    <p>You have no orders.</p>
+    <p>You have no {{ currFilter }} orders.</p>
     {% endif %}
 </div>
 <div class="footer">
-    <div style="font-weight: bold;">Total purchased amount: {{ totalamount.0 }} SEK</div>
+    <div style="font-weight: bold;">Total amount: {{ totalamount.0 | currencyFormat}}</div>
 </div>
+{% endif %}
 {% endblock %}

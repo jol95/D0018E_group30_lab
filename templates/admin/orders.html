@@ -86,6 +86,7 @@
                     <div class="col2">
                         {% if ln.4 < ln.3 %}
                         {{ln.4}}
+                        <input type="hidden" name="{{ln.1}}" value="{{ln.4}}"></ln.3>
                         {% else %}
                         <input type="hidden" name="{{ln.1}}" value="{{ln.3}}">
                         {{ln.3}}
@@ -104,10 +105,11 @@
         <div class="modal-footer">
             {% if orders.6 == 0 %}
             <button type="submit" class="btn btn-primary">Confirm order</button>
+            <a href="{{url_for('admin_orders', action='deleteorder', ordno=orders.0, filter=currFilter)}}" class="btn btn-danger">Delete order</a>
             {% elif orders.6 == 1 %}
             <a href="{{url_for('admin_orders', action='delivered', ordno=orders.0, filter=currFilter)}}" class="btn btn-primary">Ship</a>
             {% endif %}
-            <a href="{{url_for('admin_orders', filter=currFilter)}}" class="btn btn-secondary">Close</a>
+            <a href="javascript: history.go(-1);" class="btn btn-secondary">Close</a>
         </div>
         </div>
         {% if orders.6 == 0 %}
