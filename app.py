@@ -6,13 +6,17 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os, math
 from PIL import Image
 from werkzeug.utils import secure_filename
+import secrets
+from itsdangerous import URLSafeTimedSerializer as Serializer
+from flask_mail import Message, Mail
+from threading import Thread
 
 from SQLfunctions import *
 from forms import *
 
 # Initiate Flask app
 app = Flask(__name__)
-app.secret_key = "abc"
+app.config['SECRET_KEY'] = 'dsfsff4r34534erfer42ed343422'
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
@@ -24,6 +28,13 @@ app.config['ALLOWED_IMAGE_EXTENSIONS'] = ["JPG", "PNG"]
 
 
 mysql = MySQL(app)
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'simonpontinltu@gmail.com'
+app.config['MAIL_PASSWORD'] = 'Simonpontin123@'
+mail = Mail(app)
 
 ## REGISTER PAGE ##
 @app.route("/register", methods=['GET', 'POST'])
@@ -737,11 +748,10 @@ def allowed_image(filename):
 
 
 def upload_file(pic_filename):
-    #hex_rand = secrets.token_hex(8)
-    #picture_fn = secure_filename(pic_filename.filename)
-    #_, f_ext = os.path.splittext(pic_filename.filename)
-    #picture_fn =  + f_ext
-    picture_path = os.path.join(app.config['UPLOAD_FOLDER'], pic_filename)
+    hex_rand = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(pic_filename.filename)
+    picture_fn = hex_rand + f_ext
+    picture_path = os.path.join(app.config['UPLOAD_FOLDER'], picture_fn)
 
     standard_size = (125, 125)
     pic = Image.open(pic_filename)
@@ -769,23 +779,24 @@ def customerMypage():
         if form.picture.data:
             image = form.picture.data
             if allowed_image(image.filename):
-                filename = secure_filename(image.filename)
-                image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                filename = upload_file(image)
+                if profile_pic != 'default.jpg':
+                    os.remove('static/resources/' + profile_pic)
+
                 profile_pic = str(filename)
 
             else:
-                flash('File Extention Is Not Allowed', 'success')
+                flash('File Extention Is Not Allowed', 'danger')
 
 
         fname = str(form.first_name.data)
         lname = str(form.last_name.data)
-        email = str(form.email.data)
         hashed_password = str(generate_password_hash(form.password.data))
         addr = str(form.home_address.data)
         pcode = str(form.post_code.data)
         country = form.country.data
         phone = str(form.phone_number.data)
-        update = 'a.firstname="%s", a.lastname="%s", a.email="%s", a.password="%s",a.address="%s", a.postcode="%s", a.country="%s",a.phoneno="%s", a.profilepic="%s"' %(fname, lname, email, hashed_password, addr, pcode, country, phone, profile_pic)
+        update = 'a.firstname="%s", a.lastname="%s", a.password="%s",a.address="%s", a.postcode="%s", a.country="%s",a.phoneno="%s", a.profilepic="%s"' %(fname, lname, hashed_password, addr, pcode, country, phone, profile_pic)
         cond = 'custID = %s' %(data[0])
 
         updateAll('customers as a', update, cond)
@@ -796,6 +807,95 @@ def customerMypage():
     image_file = url_for('static', filename='resources/' + profile_pic)
 
     return render_template('customerMypage.html', image_file=image_file, form=form, data=data)
+
+
+
+def token_reset(self, expire_time=300):
+    s = Serializer(app.config['SECRET_KEY'], expire_time)
+    return s.dumps({'userid': self.id}).decode('utf-8')
+
+
+@staticmethod
+def verify_token_reset(token):
+    s = Serializer(app.config['SECRET_KEY'])
+    try:
+        user_id = s.loads(token)['userid']
+    except:
+        return None
+    return User.query.get(user_id)
+
+
+def send_async_email(msg):
+    with app.app_context():
+        mail.send(msg)
+
+
+def send_email(subject, recipients, html_url):
+    msg = Message(subject, recipients=recipients)
+    msg.html = html_url
+    thr = Thread(target=send_async_email, args=[msg])
+    thr.start()
+
+
+def send_password_reset_email(user_email):
+    password_reset_serializer = Serializer(app.config['SECRET_KEY'])
+    reset_url = url_for('reset_password_with_token', token = password_reset_serializer.dumps(user_email, salt='password-reset-salt'),
+        _external=True)
+
+    template = render_template('reset_password_email.html', reset_url=reset_url)
+
+    send_email('Password Reset Requested', [user_email], template)
+
+
+@app.route("/reset", methods=['GET', 'POST'])
+def request_reset():
+    form = resetRequestform()
+    if form.validate_on_submit():
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT * FROM customers WHERE email = %s', [form.email.data])
+        data = cur.fetchone()
+
+        if len(data) > 0:
+            send_password_reset_email(form.email.data)
+            flash('A Password Reset Link Has Been Sent To Youre Email', 'success')
+
+        else:
+            flash('Invalid Email Address!', 'danger')
+
+    return render_template('requestReset.html', form=form)
+
+
+
+@app.route("/reset/<token>", methods=['GET', 'POST'])
+def reset_password_with_token(token):
+    try:
+        password_reset_serializer = Serializer(app.config['SECRET_KEY'])
+        email = password_reset_serializer.loads(token, salt='password-reset-salt', max_age=3600)
+    except:
+        flash('The Password Reset Link Has Expired.', 'error')
+        return redirect(url_for('login'))
+
+    form = resetPasswordform()
+    if form.validate_on_submit():
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT * FROM customers WHERE email = %s', [email])
+        data = cur.fetchone()
+
+        if len(data) > 0:
+            hashed_password = generate_password_hash(form.password.data)
+            update = a.password="%s" % ([hashed_password])
+            cond = 'email = %s' % ([email])
+
+            updateAll('customers as a', update, cond)
+            flash('Your password has been updated!', 'success')
+            return redirect(url_for('login'))
+
+        else:
+            flash('Invalid email address!', 'danger')
+            return redirect(url_for('login'))
+
+    return render_template('reset_password_with_token.html', form=form, token=token)
+
 
 if __name__ == "__main__":
     app.debug=True
