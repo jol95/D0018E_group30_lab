@@ -1,4 +1,4 @@
-# D0018E_group30_lab
+# D0018E_group30_lab.
 ### pip install dessa lib ###
 - flask
 - flask-mysql
